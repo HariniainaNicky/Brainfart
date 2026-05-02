@@ -137,7 +137,7 @@ const Page = () => {
 
     return (
         <div className="flex flex-col gap-4 m-4 p-3 justify-center items-center">
-            <h2 className="text-2xl font-bold">Shirugame&apos;s questions</h2>
+            <h2 className="text-2xl font-bold">BrainFart&apos;s questions</h2>
             <Button variant="outline" onClick={handleGoSubmitButton}>
                 Go submit your own question
             </Button>

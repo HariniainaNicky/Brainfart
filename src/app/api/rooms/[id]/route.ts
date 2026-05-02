@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { deleteRoom, getRoomById } from "@/services/room";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyRoomAccess, verifyRoomOwnership } from "@/lib/auth-utils";
 
 export const GET = async (
   _req: NextRequest,
@@ -24,6 +25,9 @@ export const GET = async (
 
   try {
     const { id: roomId } = await context.params;
+    const authCheck = await verifyRoomAccess(roomId);
+    if (authCheck) return authCheck;
+
     const room = await getRoomById(roomId);
     return NextResponse.json(
       {
@@ -64,6 +68,9 @@ export const DELETE = async (
 
   try {
     const { id: roomId } = await context.params;
+    const authCheck = await verifyRoomOwnership(roomId);
+    if (authCheck) return authCheck;
+
     await deleteRoom(roomId);
     return NextResponse.json(
       {

@@ -28,10 +28,10 @@ export const Body = (props: BodyPropsType) => {
                 className="cursor-pointer text-4xl sm:text-5xl mb-2 md:text-6xl lg:text-7xl xl:text-8xl"
                 whileHover={{ scale: 1.4 }}
             >
-                Shirugame
+                BrainFart
             </motion.h1>
             <p className="m-4 text-center animate">
-                Ready to use your brain with Shirugame ? Create a room, share
+                Ready to use your brain with BrainFart ? Create a room, share
                 the link, and outsmart everyone else !
             </p>
             <Button variant="secondary" onClick={handlePlaySingleMode}>

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { insertUserInRoom } from "@/services/room";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyRoomOwnership } from "@/lib/auth-utils";
 
 export const PUT = async (
   req: NextRequest,
@@ -18,8 +19,17 @@ export const PUT = async (
     const data = await req.json();
     const params = await context.params;
     const roomId: string = params.id;
-    const userId: string = data.userId;
-    await insertUserInRoom(roomId, userId);
+    const targetUserId: string = data.userId;
+
+    const authCheck = await verifyRoomOwnership(roomId);
+    if (authCheck && session.user.id !== targetUserId) {
+      return NextResponse.json(
+        { message: "Forbidden: Only room owner can add other players" },
+        { status: 403 },
+      );
+    }
+
+    await insertUserInRoom(roomId, targetUserId);
     return NextResponse.json(
       {
         message: "User inserted successfully",

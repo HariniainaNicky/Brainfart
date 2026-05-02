@@ -1,7 +1,8 @@
 {
-  "name": "shirugame",
+  "name": "brainfart",
   "version": "0.1.0",
   "private": true,
+  "productName": "BrainFart",
   "scripts": {
     "dev": "tsx server.mts",
     "build": "prisma generate && next build",

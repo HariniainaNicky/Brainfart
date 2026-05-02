@@ -105,8 +105,8 @@ export const Header = (props: HeaderPropsType) => {
                     </SheetTrigger>
                     <SheetContent side="right">
                         <SheetHeader>
-                            <SheetTitle>Shirugame</SheetTitle>
-                            <SheetDescription>v0.0.1</SheetDescription>
+                            <SheetTitle>BrainFart</SheetTitle>
+                            <SheetDescription>v0.1.0</SheetDescription>
                         </SheetHeader>
                         <ul className="flex flex-col gap-4 mt-8">
                             <Button
