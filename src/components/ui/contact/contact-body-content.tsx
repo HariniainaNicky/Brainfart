@@ -4,7 +4,7 @@ import { GithubIcon, Linkedin, MailIcon, PhoneCall } from "lucide-react"
 import TypedText from "../typed-text"
 export const ContactBodyContent = () => {
   return <div className="p-10 flex flex-col gap-5 justify-center items-center">
-      <h2 className="text-3xl font-bold">Hey... Do you want or need to contact Shirugame's developer?</h2>
+      <h2 className="text-3xl font-bold">Hey... Do you want or need to contact BrainFart's developer?</h2>
       <div className="flex flex-col gap-4 justify-center items-center">
         <Button asChild><a href="mailto:ferrissushi@gmail.com"><MailIcon />Contact him</a></Button>
         <Separator />

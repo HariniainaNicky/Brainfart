@@ -13,7 +13,7 @@ export const LeaderboardHeader = () => {
       </Button>
       <ModeToggle />
       <h1 className="text-3xl sm:text-4xl md:text-6xl text-center">
-        Shirugame
+        BrainFart
       </h1>
     </div>
   );
