@@ -2,22 +2,24 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getSession, verifyNotificationOwnership } from "@/lib/auth-utils";
 
 export const PATCH = async (
     req: NextRequest,
     context: RouteContext<"/api/notifications/[id]">,
 ) => {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+    const session = getSession();
 
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    try {
-        const { id: notificationId } = await context.params;
-        const dataReceived = await req.json();
+  try {
+    const { id: notificationId } = await context.params;
+    const authCheck = await verifyNotificationOwnership(notificationId);
+    if (authCheck) return authCheck;
+
+    const dataReceived = await req.json();
 
         // TODO: Update in case you need to add other field later
         const allowedFields = ["seen"];
@@ -37,7 +39,7 @@ export const PATCH = async (
             where: {
                 id: notificationId,
             },
-            data: dataReceived,
+            data: filteredData,
         });
 
         return NextResponse.json(
@@ -69,13 +71,16 @@ export const DELETE = async (
         headers: await headers(),
     });
 
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    try {
-        const { id: notificationId } = await context.params;
-        await prisma.notification.update({
+  try {
+    const { id: notificationId } = await context.params;
+    const authCheck = await verifyNotificationOwnership(notificationId);
+    if (authCheck) return authCheck;
+
+    await prisma.notification.update({
             where: {
                 id: notificationId,
             },

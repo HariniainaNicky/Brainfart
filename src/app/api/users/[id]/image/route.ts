@@ -2,19 +2,22 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserProfile } from "@/services/user";
+import { verifyOwnership } from "@/lib/auth-utils";
 
 export const PATCH = async (req: NextRequest, context: RouteContext<"/api/users/[id]/image">) => {
 
   const session = await auth.api.getSession({
     headers: await headers(),
-});
+  });
 
-if (!session) {
-  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-}
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const { id: userId } = await context.params;
+    const authCheck = await verifyOwnership(userId);
+    if (authCheck) return authCheck;
     const dataReceived = await req.json();
     const image = dataReceived.image;
     await updateUserProfile(userId, image);

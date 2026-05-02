@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyOwnership } from "@/lib/auth-utils";
 
 export const GET = async (
   _req: NextRequest,
@@ -17,6 +18,9 @@ export const GET = async (
 
   try {
     const { id: userId } = await context.params;
+    const authCheck = await verifyOwnership(userId);
+    if (authCheck) return authCheck;
+
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
@@ -62,6 +66,9 @@ export const PATCH = async (  req: NextRequest, context: RouteContext<"/api/user
 
   try {
     const { id: userId } = await context.params;
+    const authCheck = await verifyOwnership(userId);
+    if (authCheck) return authCheck;
+
     const { score } = await req.json();
 
     const user = await prisma.user.findUnique({
