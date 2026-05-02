@@ -167,7 +167,7 @@ const Page = () => {
                     />
 
                     <p className="text-sm text-muted-foreground">
-                        Your questions will be sent to the Admin of BrainFarter.
+                        Your questions will be sent to the Admin of Shirugame.
                     </p>
 
                     <Button

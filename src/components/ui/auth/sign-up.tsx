@@ -43,7 +43,7 @@ export const SignUp = () => {
       },
       {
         onSuccess: () => {
-          toast.success("Welcome to BrainFarter.", { id: loadId });
+          toast.success("Welcome to Shirugame.", { id: loadId });
           router.push("/auth/starter")
           setLoading(false);
         },

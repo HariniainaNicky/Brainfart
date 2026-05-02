@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidelines for AI agents working on the BrainFarter codebase.
+This file provides guidelines for AI agents working on the Shirugame codebase.
 
 ## Build/Run Commands
 
