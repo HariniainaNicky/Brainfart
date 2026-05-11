@@ -125,6 +125,6 @@ body {
   font-family: "Funnel Display", system-ui;
 }
 
-h1 {
-  font-family: "Rock 3D", system-ui;
+h1, h2, h3 {
+  font-family: "Pixelify Sans", system-ui;
 }
