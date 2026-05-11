@@ -35,9 +35,9 @@ export const OAuth = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center gap-5 md:justify-around">
+    <div className="flex flex-col md:flex-row gap-3 w-full">
       <Button
-        className="flex items-center gap-2
+        className="flex items-center justify-center gap-2 w-full md:w-1/2
                    bg-card text-foreground border border-border hover:bg-accent
                    dark:bg-card dark:text-foreground dark:hover:bg-accent"
         onClick={handleGoogleSign}
@@ -45,7 +45,7 @@ export const OAuth = () => {
         { googleLoading ? ( <Spinner /> ) : ( <FcGoogle /> )} Continue with Google
       </Button>
       <Button
-        className="flex items-center gap-2
+        className="flex items-center justify-center gap-2 w-full md:w-1/2
                    bg-primary text-primary-foreground hover:bg-primary/90
                    dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
         onClick={handleGithubSign}

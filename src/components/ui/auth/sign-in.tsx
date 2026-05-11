@@ -51,8 +51,8 @@ export const SignIn = () => {
     );
   };
   return (
-    <form className="flex flex-col justify-center items-center gap-5">
-      <div className="flex flex-col gap-2">
+    <form className="flex flex-col gap-5 w-full">
+      <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="email">Email</Label>
         <Input
           {...register("email")}
@@ -61,15 +61,13 @@ export const SignIn = () => {
           placeholder="user@gmail.com"
         />
       </div>
-      <div className="flex md:flex-row flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">Your password</Label>
-          <Input
-            type={showPass ? "text" : "password"}
-            id="password"
-            {...register("password")}
-          />
-        </div>
+      <div className="flex flex-col gap-2 w-full">
+        <Label htmlFor="password">Your password</Label>
+        <Input
+          type={showPass ? "text" : "password"}
+          id="password"
+          {...register("password")}
+        />
       </div>
 
       <div className="flex flex-col justify-center items-center">
@@ -83,8 +81,8 @@ export const SignIn = () => {
       >
         Sign in
       </ButtonMotion>
-      <Link href="/auth/sign-up" className="text-sm  hover:underline">
-        Don't have an account ?
+      <Link href="/auth/sign-up" className="text-sm text-center hover:underline">
+        Don't have an account?
       </Link>
     </form>
   );
