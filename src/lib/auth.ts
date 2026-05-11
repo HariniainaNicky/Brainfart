@@ -66,7 +66,7 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+      sendChangeEmailVerification: async ({ user, newEmail, url }: { user: { name: string; email: string }; newEmail: string; url: string }) => {
         const html = `
           <div style="font-family: Arial, sans-serif; color: #111; background: #fff; line-height: 1.6; padding: 20px;">
             <h2 style="color: #000; font-weight: 600;">Confirm Your Email Change</h2>
