@@ -16,12 +16,11 @@ npm run push         # git push -u origin HEAD
 
 - **No test runner configured.** `test/` dirs are empty.
 - **No `typecheck` script.** `tsc` is only used via `build:socket`.
-- **ESLint errors are ignored during builds** (`next.config.ts`: `ignoreDuringBuilds: true`).
 - **`postinstall`** auto-runs `prisma generate`.
 
 ## Tech Stack
 
-- Next.js 15+ (App Router), TypeScript strict, Tailwind CSS v4 + `tw-animate-css`
+- Next.js 16 (App Router), TypeScript strict, Tailwind CSS v4 + `tw-animate-css`
 - Prisma ORM (PostgreSQL), Better Auth, Zustand, Socket.io
 - shadcn/ui "new-york" style, zinc base, lucide icons, `class` for dark mode
 
@@ -33,7 +32,6 @@ npm run push         # git push -u origin HEAD
 - **Tailwind v4** uses `@import "tailwindcss"` in CSS (NOT old `@tailwind` directives). PostCSS plugin is `@tailwindcss/postcss`.
 - **Socket.io** runs as a standalone server (`server.mts`). Dev: `tsx server.mts`. Prod Socket server: compiled `dist/server.mjs` via `build:socket`.
 - **Two socket patterns coexist**: `socket-provider.tsx` (simple `createInstanceOfSocket`) and `useSocketStore.ts` (Zustand store with `NEXT_SOCKET_BASE_URL` env var).
-- **Dockerfile CMD has a bug**: `npm run socket:start` should be `npm run start:socket`.
 
 ## Conventions
 

@@ -107,18 +107,27 @@ export const Body = (props: BodyPropsType) => {
                 transition={{ delay: 0.5, duration: 0.6 }}
                 className="w-full max-w-4xl"
             >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {features.map((feature, i) => (
                         <motion.div
                             key={feature.title}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
-                            className="flex flex-col items-center text-center gap-3 rounded-xl border border-border bg-card p-6 hover:shadow-lg transition-shadow duration-200"
+                            whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
+                            className="relative flex flex-col items-center text-center gap-2 rounded-xl border-2 border-primary/20 bg-card pt-14 pb-6 px-6 hover:border-primary/40 hover:shadow-[0_0_24px_rgba(73,17,28,0.25)] transition-shadow duration-200"
                         >
-                            <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <feature.icon className="size-6 text-primary" />
+                            <div className="absolute top-0 left-0 right-0 h-12 bg-primary rounded-t-xl flex items-center justify-center">
+                                <motion.div
+                                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <feature.icon className="size-6 text-primary-foreground" />
+                                </motion.div>
                             </div>
+                            <span className="absolute top-2 right-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+                                {i === 0 ? "1UP" : i === 1 ? "VS" : "HI"}
+                            </span>
                             <h3 className="font-semibold text-lg">{feature.title}</h3>
                             <p className="text-sm text-muted-foreground">{feature.desc}</p>
                         </motion.div>
