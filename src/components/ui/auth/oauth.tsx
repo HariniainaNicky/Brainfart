@@ -38,16 +38,16 @@ export const OAuth = () => {
     <div className="flex flex-col md:flex-row justify-center items-center gap-5 md:justify-around">
       <Button
         className="flex items-center gap-2
-                   bg-white text-gray-800 border border-gray-300 hover:bg-gray-100
-                   dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                   bg-card text-foreground border border-border hover:bg-accent
+                   dark:bg-card dark:text-foreground dark:hover:bg-accent"
         onClick={handleGoogleSign}
       >
         { googleLoading ? ( <Spinner /> ) : ( <FcGoogle /> )} Continue with Google
       </Button>
       <Button
         className="flex items-center gap-2
-                   bg-gray-900 text-white hover:bg-gray-800
-                   dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                   bg-primary text-primary-foreground hover:bg-primary/90
+                   dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
         onClick={handleGithubSign}
       >
         { githubLoading ? ( <Spinner /> ) : ( <FaGithub /> )} Continue with GitHub

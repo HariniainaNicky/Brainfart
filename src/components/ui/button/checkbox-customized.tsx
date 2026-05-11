@@ -25,14 +25,14 @@ export function CustomCheckbox(props: CCPropsType) {
           w-6 h-6 border-2 rounded flex items-center justify-center transition-colors duration-200
           ${
             checked
-              ? "bg-black border-black dark:bg-white dark:border-white"
-              : "bg-white border-black dark:bg-black dark:border-white"
+              ? "bg-primary border-primary dark:bg-primary dark:border-primary"
+              : "bg-card border-border dark:bg-card dark:border-border"
           }
         `}
       >
         {checked && (
           <svg
-            className={`w-4 h-4 ${checked ? "text-white dark:text-black" : ""}`}
+            className={`w-4 h-4 ${checked ? "text-primary-foreground" : ""}`}
             fill="none"
             stroke="currentColor"
             strokeWidth={2}
@@ -47,7 +47,7 @@ export function CustomCheckbox(props: CCPropsType) {
         )}
       </div>
 
-      <span className="text-black dark:text-white">{props.answer}</span>
+      <span className="text-foreground">{props.answer}</span>
     </label>
   );
 }
