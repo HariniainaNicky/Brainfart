@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "@/app/globals.css";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -8,13 +9,21 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="absolute bottom-1/4 left-1/3 -translate-x-1/2 w-[300px] h-[300px] rounded-full bg-primary/5 dark:bg-primary/10 blur-2xl" />
       </div>
       <div className="relative flex flex-col items-center gap-6 sm:gap-8 w-full max-w-sm sm:max-w-md">
-        <div className="text-center space-y-1">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-            BrainFart
-          </h1>
+        <div className="text-center space-y-2">
+          <Link href="/">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight hover:text-primary transition-colors">
+              BrainFart
+            </h1>
+          </Link>
           <p className="text-xs sm:text-sm text-muted-foreground">
             Sign in to play
           </p>
+          <Link
+            href="/"
+            className="inline-block text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to home
+          </Link>
         </div>
         <div className="w-full rounded-xl border border-border bg-card p-5 sm:p-6 md:p-8 shadow-sm">
           {children}

@@ -63,15 +63,15 @@ export const SignIn = () => {
       </div>
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="password">Your password</Label>
-        <Input
-          type={showPass ? "text" : "password"}
-          id="password"
-          {...register("password")}
-        />
-      </div>
-
-      <div className="flex flex-col justify-center items-center">
-        <ShowPassButton showPass={showPass} setShowPass={setShowPass} />
+        <div className="relative">
+          <Input
+            type={showPass ? "text" : "password"}
+            id="password"
+            {...register("password")}
+            className="pr-9"
+          />
+          <ShowPassButton showPass={showPass} setShowPass={setShowPass} />
+        </div>
       </div>
       <ButtonMotion
         className="w-full"
