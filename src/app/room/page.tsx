@@ -3,7 +3,7 @@ import { Room } from "@/components/ui/room/room";
 
 const Page = () => {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="min-h-screen">
       <RoomHeader targetedRedirect="/" />
       <Room />
     </div>

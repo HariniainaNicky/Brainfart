@@ -15,9 +15,9 @@ export const RoomHeader = (props: RoomHeaderProps) => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="m-5 flex gap-3">
+      <div className="flex items-center justify-between px-4 py-3">
         <Button variant="ghost" size="icon" onClick={() => router.push(props.targetedRedirect)}>
-          <ArrowLeft />
+          <ArrowLeft size={20} />
         </Button>
         <ModeToggle />
       </div>
