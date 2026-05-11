@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: brainfart
+    runtime: node
+    buildCommand: npm run build:socket
+    startCommand: npm run start:socket
+    envVars:
+      - key: NODE_ENV
+        value: production
