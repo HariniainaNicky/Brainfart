@@ -1,64 +1,73 @@
 # AGENTS.md
 
-This file provides guidelines for AI agents working on the Shirugame codebase.
+Project: **BrainFart** (`brainfart`, aka shirugame-trivia) — real-time multiplayer trivia game.
 
-## Build/Run Commands
+## Commands
 
 ```bash
-npm run dev          # Dev server with Socket.io (uses tsx)
-npm run build        # Build for production (auto-runs prisma generate)
-npm run build:socket # Build with custom Socket.io server
-npm run start        # Production Next.js
-npm run start:socket # Production with Socket.io
+npm run dev          # Dev server (tsx server.mts — custom Socket.io, NOT next dev)
+npm run build        # prisma generate && next build
+npm run build:socket # prisma generate && next build && tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json
+npm run start        # next start
+npm run start:socket # prisma generate && node dist/server.mjs
 npm run lint         # ESLint
+npm run push         # git push -u origin HEAD
 ```
 
-**Note:** No test runner configured. Add Vitest if needed. No separate `typecheck` script.
+- **No test runner configured.** `test/` dirs are empty.
+- **No `typecheck` script.** `tsc` is only used via `build:socket`.
+- **ESLint errors are ignored during builds** (`next.config.ts`: `ignoreDuringBuilds: true`).
+- **`postinstall`** auto-runs `prisma generate`.
 
 ## Tech Stack
 
-- **Framework:** Next.js 15+ (App Router)
-- **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v4 + shadcn/ui
-- **Database:** Prisma ORM
-- **Auth:** Better Auth
-- **State:** Zustand
-- **Real-time:** Socket.io (custom server.mts)
+- Next.js 15+ (App Router), TypeScript strict, Tailwind CSS v4 + `tw-animate-css`
+- Prisma ORM (PostgreSQL), Better Auth, Zustand, Socket.io
+- shadcn/ui "new-york" style, zinc base, lucide icons, `class` for dark mode
 
-## Code Style
+## Key Quirks
 
-### Imports
-React/Next → libs → aliases (`@/*`) → relative
+- **Prisma client** is generated to `src/generated/prisma/` (custom `output` path in schema).
+- Two `prisma` files exist: `src/lib/prisma.ts` and `src/lib/prisma.mts` — both export the same singleton. The `.mts` version is used by `tsconfig.server.json` for the Socket.io server bundle. Import from `@/lib/prisma`.
+- **shadcn/ui components** live at `@/components/ui/shadcn-component/` (non-default alias).
+- **Tailwind v4** uses `@import "tailwindcss"` in CSS (NOT old `@tailwind` directives). PostCSS plugin is `@tailwindcss/postcss`.
+- **Socket.io** runs as a standalone server (`server.mts`). Dev: `tsx server.mts`. Prod Socket server: compiled `dist/server.mjs` via `build:socket`.
+- **Two socket patterns coexist**: `socket-provider.tsx` (simple `createInstanceOfSocket`) and `useSocketStore.ts` (Zustand store with `NEXT_SOCKET_BASE_URL` env var).
+- **Dockerfile CMD has a bug**: `npm run socket:start` should be `npm run start:socket`.
 
-### Path Aliases
-`@/*` → `./src/*` (components, lib, stores, hooks, types, utils)
+## Conventions
 
-### Conventions
-- Components: PascalCase
-- Hooks/Stores: camelCase with `use` prefix
-- API routes: lowercase `route.ts`
-- Use `type` for shapes, `interface` for extensible contracts
-- Prefer `undefined` over `null` for optionals
+- Components: PascalCase. Hooks/stores: camelCase with `use` prefix.
+- API routes: lowercase `route.ts`.
+- Imports: React/Next → libs → `@/*` → relative.
+- Use `type` for shapes, `interface` for extensible contracts. Prefer `undefined` over `null`.
 
-## Error Handling
+## Commit
+
+Conventional commits via Commitizen (`cz_conventional_commits`). Pre-commit hook enforces commitizen; pre-push hook validates branch commits.
+
+## Auth
+
+Better Auth with email/password, GitHub, Google OAuth, username plugin, admin plugin, email verification, 30-day sessions.
 
 ```typescript
-try {
-  // async operations
-} catch (error) {
-  console.error(error);
-  return NextResponse.json({ message: "Error" }, { status: 500 });
-}
+import { auth } from "@/lib/auth";
+import { authClient } from "@/lib/auth-client"; // client side
 ```
-
-## Prisma
-
-- Import from `@/lib/prisma` (singleton)
-- Run `npx prisma generate` after schema changes (auto-runs on install/build)
-- Create migration: `npx prisma migrate dev --name <name>`
 
 ## Environment Variables
 
-- `DATABASE_URL` - Prisma connection
-- `NEXT_PUBLIC_APP_URL` - App URL
-- Auth credentials (Better Auth)
+| Variable | Required | Notes |
+|---|---|---|
+| `DATABASE_URL` | Yes | Prisma Postgres connection string |
+| `BETTER_AUTH_SECRET` | Yes | |
+| `BETTER_AUTH_URL` | Yes | |
+| `NEXT_PUBLIC_APP_URL` | Yes | |
+| `NEXT_SOCKET_BASE_URL` | Yes | Used in `useSocketStore` — not in `.env.example`! |
+| `GITHUB_CLIENT_ID/SECRET` | Optional | Social login |
+| `GOOGLE_CLIENT_ID/SECRET` | Optional | Social login |
+| `NODEMAILER_USER/APP_PASSWORD` | Optional | Email verification |
+
+## Local Skills
+
+The repo bundles `.opencode/skills/ui-ux-pro-max/` — available for UI/UX guidance.
