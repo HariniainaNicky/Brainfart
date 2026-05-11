@@ -60,8 +60,8 @@ export const SignUp = () => {
   };
 
   return (
-    <form className="flex flex-col justify-center items-center gap-5">
-      <div className="flex flex-col gap-2">
+    <form className="flex flex-col gap-5 w-full">
+      <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="email">Email</Label>
         <Input
           type="email"
@@ -71,22 +71,20 @@ export const SignUp = () => {
         />
       </div>
 
-      <div className="flex md:flex-row flex-col gap-4">
-        <div className="flex flex-col gap-2 relative">
-          <Label htmlFor="NewPassword">New password</Label>
-          <Input
-            type={showPass ? "text" : "password"}
-            id="NewPassword"
-            {...register("password", {
-              onChange: (e) => setCPass(e.target.value),
-            })}
-          />
-        </div>
+      <div className="flex flex-col gap-2 w-full">
+        <Label htmlFor="newPassword">New password</Label>
+        <Input
+          type={showPass ? "text" : "password"}
+          id="newPassword"
+          {...register("password", {
+            onChange: (e) => setCPass(e.target.value),
+          })}
+        />
+      </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">Retype your password</Label>
-          <Input type={showPass ? "text" : "password"} id="password" />
-        </div>
+      <div className="flex flex-col gap-2 w-full">
+        <Label htmlFor="confirmPassword">Retype your password</Label>
+        <Input type={showPass ? "text" : "password"} id="confirmPassword" />
       </div>
 
       <div className="flex flex-col justify-center items-center">
@@ -109,8 +107,8 @@ export const SignUp = () => {
         Sign up
       </ButtonMotion>
 
-      <Link href="/auth/sign-in" className="text-sm  hover:underline">
-        Already have an account ?
+      <Link href="/auth/sign-in" className="text-sm text-center hover:underline">
+        Already have an account?
       </Link>
     </form>
   );
