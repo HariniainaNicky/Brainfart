@@ -73,22 +73,25 @@ export const SignUp = () => {
 
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="newPassword">New password</Label>
-        <Input
-          type={showPass ? "text" : "password"}
-          id="newPassword"
-          {...register("password", {
-            onChange: (e) => setCPass(e.target.value),
-          })}
-        />
+        <div className="relative">
+          <Input
+            type={showPass ? "text" : "password"}
+            id="newPassword"
+            {...register("password", {
+              onChange: (e) => setCPass(e.target.value),
+            })}
+            className="pr-9"
+          />
+          <ShowPassButton showPass={showPass} setShowPass={setShowPass} />
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="confirmPassword">Retype your password</Label>
-        <Input type={showPass ? "text" : "password"} id="confirmPassword" />
-      </div>
-
-      <div className="flex flex-col justify-center items-center">
-        <ShowPassButton showPass={showPass} setShowPass={setShowPass} />
+        <div className="relative">
+          <Input type={showPass ? "text" : "password"} id="confirmPassword" className="pr-9" />
+          <ShowPassButton showPass={showPass} setShowPass={setShowPass} />
+        </div>
       </div>
 
       <PasswordStrengthBar
