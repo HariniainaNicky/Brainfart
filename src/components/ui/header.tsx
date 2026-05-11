@@ -41,9 +41,6 @@ export const Header = (props: HeaderPropsType) => {
             setUnseenNotificationsNumber(unseenNotifications.length);
         }
     }, [userData])
-    console.log(containsNotificationUnseen);
-    console.log(unseenNotificationsNumber);
-
     const handleLogOut = async () => {
         try {
             setLoading(true);
