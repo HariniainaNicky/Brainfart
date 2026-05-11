@@ -11,7 +11,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <html suppressHydrationWarning>
             <head>
                 <link
-                    href="https://fonts.googleapis.com/css2?family=Rock+3D&display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
                     rel="stylesheet"
                 />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />

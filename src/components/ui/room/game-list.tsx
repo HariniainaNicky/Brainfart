@@ -64,7 +64,7 @@ export const GameList = () => {
                   <p className="text-xl md:text-2xl font-medium">
                     {room.title}
                   </p>
-                  <p className="text-sm md:text-base text-gray-500">
+                  <p className="text-sm md:text-base text-muted-foreground">
                     {room.openedBy.email}
                   </p>
                 </div>
