@@ -97,28 +97,30 @@ export const SinglePlayerMode = () => {
     }
   };
 
-  return <div className="flex flex-col gap-4 items-center p-3">
-    <h2 className="text-2xl font-bold text-center">Single player mode</h2>
+  return <div className="flex flex-col gap-6 items-center w-full max-w-lg mx-auto px-4 pb-8">
+    <h2 className="text-xl md:text-2xl font-bold tracking-tight text-center">Single player mode</h2>
 
-    { !startGame ? <FilterSelector setTypeId={setTypeId} typeId={typeId}  />: null}
-    <div className="flex flex-col items-center justify-center gap-4" hidden={startGame}>
-      <p>Number of questions</p>
-      <div className="flex flex-row items-center gap-4">
-        <div>{numberOfQuestion}</div>
-        <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
+    { !startGame ? <div className="w-full rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <div className="flex flex-col items-center gap-4">
+        <FilterSelector setTypeId={setTypeId} typeId={typeId}  />
+        <p className="text-sm text-muted-foreground">Number of questions</p>
+        <div className="flex flex-row items-center gap-4">
+          <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>
+          <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
+        </div>
+        <Button
+          variant="secondary"
+          disabled={loading}
+          onClick={generateQuestionsHandler}
+        >
+          Generate questions
+        </Button>
+        <QuestionDisplayer
+          loading={loading}
+          questions={generatedQuestion}
+        />
       </div>
-      <Button
-        variant="secondary"
-        disabled={loading}
-        onClick={generateQuestionsHandler}
-      >
-        Generate questions
-      </Button>
-      <QuestionDisplayer
-        loading={loading}
-        questions={generatedQuestion}
-      />
-    </div>
+    </div> : null}
 
     <Button onClick={() => setStartGame(true)} variant="default" hidden={startGame} disabled={generatedQuestion.length === 0}>
       Start

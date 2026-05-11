@@ -75,43 +75,47 @@ export const RoomCreationBodyCard = () => {
     }
   };
   return (
-    <div className="flex flex-col gap-4 mx-5">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-center gap-4">
-          <Input
-            placeholder="Choose a title"
-            type="text"
-            {...register("title" ,{required: "You must enter a title"})}
-          />
-          <ChronoTimingSelector setChronoTiming={setChronoTiming} chronoTiming={chronoTiming} />
-          <FilterSelector setTypeId={setTypeId} typeId={typeId} />
-          <div className="flex flex-col items-center justify-center gap-4">
-            <p>Number of questions</p>
-            <div className="flex flex-row items-center gap-4">
-              <div>{numberOfQuestion}</div>
-              <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
-            </div>
-            <Button
-              variant="secondary"
-              disabled={loading}
-              onClick={generateQuestionsHandler}
-            >
-              Generate questions
-            </Button>
-            <QuestionDisplayer
-              loading={loading}
-              questions={generatedQuestion}
-            />
-          </div>
-        </div>
-        <Button
-          disabled={loading}
-          onClick={handleSubmit(createRoomHandler, onInvalidSubmit)}
-          variant="default"
-        >
-          Create
-        </Button>
+    <div className="flex flex-col gap-5 w-full">
+      <Input
+        placeholder="Choose a title"
+        type="text"
+        {...register("title" ,{required: "You must enter a title"})}
+      />
+
+      <div className="flex flex-wrap items-center gap-3">
+        <ChronoTimingSelector setChronoTiming={setChronoTiming} chronoTiming={chronoTiming} />
+        <FilterSelector setTypeId={setTypeId} typeId={typeId} />
       </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground">Questions:</span>
+          <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>
+          <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
+        </div>
+
+        <Button
+          variant="secondary"
+          disabled={loading}
+          onClick={generateQuestionsHandler}
+          className="w-full sm:w-auto"
+        >
+          Generate questions
+        </Button>
+
+        <QuestionDisplayer
+          loading={loading}
+          questions={generatedQuestion}
+        />
+      </div>
+
+      <Button
+        disabled={loading}
+        onClick={handleSubmit(createRoomHandler, onInvalidSubmit)}
+        className="w-full"
+      >
+        Create room
+      </Button>
     </div>
   );
 };

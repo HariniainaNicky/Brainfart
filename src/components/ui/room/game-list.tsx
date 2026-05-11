@@ -7,6 +7,8 @@ import { Spinner } from "../shadcn-component/spinner";
 import { Room } from "@/types/db";
 import { filterSearchRoom } from "@/utils/func";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { Users } from "lucide-react";
 
 export const GameList = () => {
   const router = useRouter();
@@ -35,51 +37,61 @@ export const GameList = () => {
   }, [searchedRooms]);
 
   return (
-    <div className="px-4 py-4 flex flex-col gap-4">
-      {/* Search bar */}
+    <div className="w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
       <RoomSearchBar loading={loading} setSearchedRooms={setSearchedRooms} />
-      <h3 className="text-lg md:text-xl font-semibold">
-        List of available rooms:
+      <h3 className="text-lg md:text-xl font-semibold text-center sm:text-left">
+        Available rooms
       </h3>
 
-      {/* Scrollable room list */}
-      <ScrollArea className="flex flex-col gap-3 rounded-md border p-4 h-[60vh] md:h-[70vh] overflow-auto">
+      <ScrollArea className="rounded-xl border border-border bg-card p-4 h-[60vh] md:h-[65vh]">
         {!loading ? (
           rooms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center">
-              <p>No rooms yet... come back later</p>
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+              <Users size={40} strokeWidth={1.5} />
+              <p className="text-sm">No rooms yet... come back later</p>
             </div>
           ) : (
-            rooms.map((room, index) => (
-              <li
-                key={room.id}
-                className="border-b p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 hover:cursor-pointer"
-                onClick={() => router.push(`/room/${room.id}`)}
-                >
-                {/* Room info */}
-                <div
-                  className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full sm:w-auto"
+            <div className="flex flex-col gap-3">
+              {rooms.map((room, index) => (
+                <motion.div
+                  key={room.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                   onClick={() => router.push(`/room/${room.id}`)}
+                  className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 cursor-pointer transition-all duration-200 hover:border-primary/30 hover:shadow-[0_0_12px_-4px_hsl(var(--primary))]"
                 >
-                  <p className="text-xl md:text-2xl font-medium">
-                    {room.title}
-                  </p>
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    {room.openedBy.email}
-                  </p>
-                </div>
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <p className="text-base md:text-lg font-semibold truncate">
+                      {room.title}
+                    </p>
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">
+                      {room.openedBy.email}
+                    </p>
+                  </div>
 
-                {/* Buttons */}
-                <div className="flex gap-2 flex-wrap sm:flex-nowrap mt-2 sm:mt-0">
-                  <Button onClick={() => router.push(`/room/${room.id}`)}>
-                    Join
-                  </Button>
-                </div>
-              </li>
-            ))
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Users size={14} />
+                      {room.players?.length || 0}
+                    </span>
+                    <Button
+                      size="sm"
+                      className="transition-all duration-200 group-hover:bg-primary group-hover:text-primary-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/room/${room.id}`);
+                      }}
+                    >
+                      Join
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           )
         ) : (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-12">
             <Spinner />
           </div>
         )}
