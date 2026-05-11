@@ -67,7 +67,7 @@ export const Header = (props: HeaderPropsType) => {
     };
 
     return (
-        <div className="flex flex-row justify-between items-center md:m-4 rounded-3xl hover:shadow-2xl dark:hover:shadow-blue-900 transition-all duration-200 ease-in-out">
+        <div className="flex flex-row justify-between items-center md:m-4 rounded-3xl hover:shadow-2xl dark:hover:shadow-primary/20 transition-all duration-200 ease-in-out">
             <div className="m-5 sm:flex hidden">
                 <ModeToggle />
             </div>
