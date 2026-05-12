@@ -115,7 +115,7 @@ export const Body = (props: BodyPropsType) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
                             whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
-                            className="relative flex flex-col items-center text-center gap-2 rounded-xl border-2 border-primary/20 bg-card pt-14 pb-6 px-6 hover:border-primary/40 hover:shadow-[0_0_24px_rgba(73,17,28,0.25)] transition-shadow duration-200"
+                            className="relative flex flex-col items-center text-center gap-2 rounded-xl border-2 border-primary/20 bg-card pt-14 pb-6 px-6 hover:border-primary/40 hover:shadow-md hover:ring-1 hover:ring-primary/30 transition-all duration-200"
                         >
                             <div className="absolute top-0 left-0 right-0 h-12 bg-primary rounded-t-xl flex items-center justify-center">
                                 <motion.div

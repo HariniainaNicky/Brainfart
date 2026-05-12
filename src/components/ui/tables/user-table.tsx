@@ -25,7 +25,7 @@ export const UserTable = ({ users, handleRefresh  }: UserTablePropsType) => {
   }, [handleRefresh]);
 
   return (
-    <div className="shadow-2xl dark:shadow-blue-700 max-w-full overflow-x-hidden border rounded-lg">
+    <div className="shadow-2xl dark:shadow-primary/20 max-w-full overflow-x-hidden border rounded-lg">
       <Table className="min-w-[400px] md:min-w-[600px] lg:min-w-[800px]">
         <TableHeader>
           <TableRow>
