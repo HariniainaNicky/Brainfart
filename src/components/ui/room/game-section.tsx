@@ -161,7 +161,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
         </Button>
       </form>
 
-      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions}/> : null }
+      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions} roomId={room?.id || ""}/> : null }
     </div>
   );
 };
