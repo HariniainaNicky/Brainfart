@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { insertRoomPlayer } from "@/utils/func";
 import { authClient } from "@/lib/auth-client";
-import { CircleX, RefreshCw, LogIn, LogOut, Play, User, HelpCircle } from "lucide-react";
+import { CircleX, RefreshCw, LogIn, LogOut, Play, User as UserIcon } from "lucide-react";
 import { quitRoom } from "@/utils/func";
 import { GameSection } from "./game-section";
 import { Session } from "@/types/better-auth";
@@ -103,7 +103,7 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
 
         <div className="flex flex-col gap-2 mb-6">
           <span className="text-sm font-semibold flex items-center gap-1.5">
-            <User size={14} />
+            <UserIcon size={14} />
             Players
           </span>
           <PlayerList players={room?.players} />
