@@ -36,9 +36,10 @@ model User {
   banReason     String?
   banExpires    String?
 
-  openedRooms Room[] @relation("OpenedRooms")
-  wonRooms    Room[] @relation("Winner")
-  joinedRooms Room[] @relation("RoomPlayers")
+  openedRooms  Room[] @relation("OpenedRooms")
+  wonRooms     Room[] @relation("Winner")
+  joinedRooms  Room[] @relation("RoomPlayers")
+  roomScores   RoomPlayerScore[]
 }
 
 model Room {
@@ -48,12 +49,24 @@ model Room {
   winner         User?      @relation("Winner", fields: [winnerId], references: [id])
   questions      Question[]
   players        User[]     @relation("RoomPlayers")
+  playerScores   RoomPlayerScore[]
   startDate      DateTime   @default(now())
   chronoTiming   Int        @default(10)
   questionTypeId String?
   questionCount  Int        @default(10)
   openedById     String
   openedBy       User       @relation("OpenedRooms", fields: [openedById], references: [id])
+}
+
+model RoomPlayerScore {
+  roomId   String
+  userId   String
+  score    Int       @default(0)
+  finished Boolean   @default(false)
+  room     Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([roomId, userId])
 }
 
 model Question {
