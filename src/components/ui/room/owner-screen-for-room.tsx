@@ -203,6 +203,7 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
             className="flex-1 gap-2"
             variant="destructive"
             onClick={handleDeleteRoom}
+            disabled={room?.closed}
           >
             <Trash2 size={16} />
             Close room
