@@ -144,15 +144,15 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button className="flex-1 gap-2" onClick={handleJoinRoom} disabled={isUserInRoom}>
+          <Button className="flex-1 gap-2" onClick={handleJoinRoom} disabled={isUserInRoom || room?.closed}>
             <LogIn size={16} />
             {isUserInRoom ? "Joined" : "Join"}
           </Button>
-          <Button className="flex-1 gap-2" disabled={!isUserInRoom} onClick={handleReplay}>
+          <Button className="flex-1 gap-2" disabled={!isUserInRoom || room?.closed} onClick={handleReplay}>
             <Play size={16} />
             Replay
           </Button>
-          <Button className="flex-1 gap-2" variant="secondary" onClick={handleLeaveRoom} disabled={!isUserInRoom}>
+          <Button className="flex-1 gap-2" variant="secondary" onClick={handleLeaveRoom} disabled={!isUserInRoom || room?.closed}>
             <LogOut size={16} />
             Leave
           </Button>

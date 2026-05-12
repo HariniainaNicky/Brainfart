@@ -186,6 +186,7 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
           <Button
             className="flex-1 gap-2"
             onClick={handlePlay}
+            disabled={room?.closed}
           >
             <Play size={16} />
             Play
