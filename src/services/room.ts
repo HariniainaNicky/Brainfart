@@ -63,12 +63,18 @@ export const quitRoom = async (roomId: string, userId: string) => {
 };
 
 export const closeRoom = async (roomId: string) => {
+  const topPlayer = await prisma.roomPlayerScore.findFirst({
+    where: { roomId },
+    orderBy: { score: "desc" },
+  });
+
   await prisma.room.update({
     where: {
       id: roomId,
     },
     data: {
       closed: true,
+      winnerId: topPlayer?.userId || null,
     },
   });
 };
