@@ -81,6 +81,19 @@ export const initializeRank = async (userId: string) => {
     }
 };
 
+export const refreshRanks = async (userId: string) => {
+    try {
+        const res = await fetch(`/api/users/${userId}/rank`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+        });
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 // TODO: A better critieria function that handle everything.
 export const getUsersWithCriteria = async (criteria: string) => {
     try {

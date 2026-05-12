@@ -1,5 +1,5 @@
 "use client"
-import { getUsersWithCriteria, initializeRank } from "@/utils/func";
+import { getUsersWithCriteria, refreshRanks } from "@/utils/func";
 import { User } from "@/types/db";
 import { useState, useEffect } from "react";
 import { Button } from "../shadcn-component/button";
@@ -22,7 +22,7 @@ export const LeaderboardBody = () => {
   }, []);
 
   const handleRefresh = async () => {
-    await initializeRank(session?.user?.id || "");
+    await refreshRanks(session?.user?.id || "");
     const users = await getUsersWithCriteria("rank");
     setUsers(users.data);
   }
