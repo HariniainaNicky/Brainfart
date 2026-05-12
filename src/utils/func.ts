@@ -245,6 +245,31 @@ export const quitRoom = async (roomId: string, userId: string) => {
     }
 };
 
+export const submitRoomScore = async (roomId: string, userId: string, score: number, finished: boolean) => {
+    try {
+        const url = `/api/rooms/${roomId}/scores`;
+        const res = await fetch(url, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, score, finished }),
+        });
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const fetchRoomScores = async (roomId: string) => {
+    try {
+        const url = `/api/rooms/${roomId}/scores`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const getRandomAnswer = async () => {
     try {
         const url = `/api/questions/randomAnswer`;
