@@ -154,33 +154,32 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
                   <PartUnderConstruction />
                 </div>
               </CarouselItem>
-              <CarouselItem>
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold flex items-center gap-1.5">
-                    <Trophy size={14} />
-                    Scores
-                  </span>
-                  <div className="flex flex-col gap-2 max-h-60 overflow-y-auto rounded-lg border border-border p-3">
-                    {scores.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-4">No scores yet</p>
-                    ) : (
-                      scores.map((entry, i) => (
-                        <div key={i} className="flex items-center justify-between text-sm py-1.5 border-b border-border last:border-0">
-                          <span className="flex items-center gap-2">
-                            <span className="text-muted-foreground w-4">#{i + 1}</span>
-                            {entry.user.username || entry.user.email}
-                          </span>
-                          <span className="font-semibold">{entry.score}pts</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </CarouselItem>
             </CarouselContent>
             <CarouselPrevious className="hidden md:flex" />
             <CarouselNext className="hidden md:flex" />
           </Carousel>
+        </div>
+
+        <div className="flex flex-col gap-2 mb-6">
+          <span className="text-sm font-semibold flex items-center gap-1.5">
+            <Trophy size={14} />
+            Scores
+          </span>
+          <div className="flex flex-col gap-1 rounded-lg border border-border p-3 max-h-40 overflow-y-auto">
+            {scores.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-2">No scores yet</p>
+            ) : (
+              scores.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between text-sm py-1 border-b border-border last:border-0">
+                  <span className="flex items-center gap-2">
+                    <span className="text-muted-foreground w-4">#{i + 1}</span>
+                    {entry.user.username || entry.user.email}
+                  </span>
+                  <span className="font-semibold">{entry.score}pts</span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
