@@ -16,7 +16,8 @@ import { motion, AnimatePresence } from "motion/react";
 
 type GameSectionProps = {
   room: Room | undefined;
-  session: Session
+  session: Session;
+  onBack?: () => void;
 };
 
 type MyAnswersVSTheAnswers = { myAnswers: string[], theAnswers: string[], questions: string[] };
@@ -30,7 +31,7 @@ const answerVariants = {
   }),
 };
 
-export const GameSection = ({ room, session }: GameSectionProps) => {
+export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(false);
@@ -216,7 +217,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
         </AnimatePresence>
       </form>
 
-      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions} roomId={room?.id || ""}/> : null }
+      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions} onBack={onBack}/> : null }
     </div>
   );
 };

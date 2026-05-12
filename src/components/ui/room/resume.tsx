@@ -1,16 +1,14 @@
 import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "../shadcn-component/button";
 
 type ResumeProps = {
   myAnswers: string[];
   theAnswers: string[];
   questions: string[];
-  roomId?: string;
+  onBack?: () => void;
 };
 
-export const Resume = ({ myAnswers, theAnswers, questions, roomId }: ResumeProps) => {
-  const router = useRouter();
+export const Resume = ({ myAnswers, theAnswers, questions, onBack }: ResumeProps) => {
   const correctCount = myAnswers.filter(
     (answer, i) => answer === theAnswers[i],
   ).length;
@@ -23,14 +21,14 @@ export const Resume = ({ myAnswers, theAnswers, questions, roomId }: ResumeProps
         </p>
       </div>
 
-      {roomId && (
+      {onBack && (
         <Button
           variant="outline"
           className="gap-2 self-center"
-          onClick={() => router.push(`/room/${roomId}`)}
+          onClick={onBack}
         >
           <ArrowLeft size={16} />
-          Back to room
+          Back to details
         </Button>
       )}
 

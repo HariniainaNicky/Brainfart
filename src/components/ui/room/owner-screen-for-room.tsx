@@ -212,7 +212,7 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
       </div>
 
       <div id="game-section" hidden={!userInRoom}>
-        <GameSection room={room} session={session} />
+        <GameSection room={room} session={session} onBack={() => setUserInRoom(false)} />
       </div>
     </div>
   );

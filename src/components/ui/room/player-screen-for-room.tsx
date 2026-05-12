@@ -160,7 +160,7 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
       </div>
 
       <div id="game-section" hidden={!userInRoom}>
-        <GameSection room={room} session={session}/>
+        <GameSection room={room} session={session} onBack={() => setGameStarted(false)} />
       </div>
     </div>
   );
