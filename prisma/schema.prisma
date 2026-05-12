@@ -42,16 +42,18 @@ model User {
 }
 
 model Room {
-  id         String     @id
-  title      String     @unique
-  winnerId   String?
-  winner     User?      @relation("Winner", fields: [winnerId], references: [id])
-  questions  Question[]
-  players    User[]     @relation("RoomPlayers")
-  startDate  DateTime   @default(now())
-  chronoTiming Int @default(10)
-  openedById String
-  openedBy   User       @relation("OpenedRooms", fields: [openedById], references: [id])
+  id             String     @id
+  title          String     @unique
+  winnerId       String?
+  winner         User?      @relation("Winner", fields: [winnerId], references: [id])
+  questions      Question[]
+  players        User[]     @relation("RoomPlayers")
+  startDate      DateTime   @default(now())
+  chronoTiming   Int        @default(10)
+  questionTypeId String?
+  questionCount  Int        @default(10)
+  openedById     String
+  openedBy       User       @relation("OpenedRooms", fields: [openedById], references: [id])
 }
 
 model Question {
