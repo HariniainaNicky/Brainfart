@@ -1,5 +1,5 @@
 import { Question, Room } from "@/types/db";
-import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare, Trophy } from "lucide-react";
+import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare, Trophy, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -14,6 +14,8 @@ import { Button } from "../shadcn-component/button";
 import { deleteRoomById, fetchRoomScores } from "@/utils/func";
 import toast from "react-hot-toast";
 import { PartUnderConstruction } from "../chore-component/part-under-construction";
+import { GameSection } from "./game-section";
+import { Session } from "@/types/better-auth";
 
 type RoomScore = {
   score: number;
@@ -23,16 +25,22 @@ type RoomScore = {
 
 type OwnerScreenForRoomProps = {
   room: Room | undefined;
+  session: Session;
 };
 
-export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
+export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) => {
   const router = useRouter();
   const [scores, setScores] = useState<RoomScore[]>([]);
+  const [userInRoom, setUserInRoom] = useState(false);
 
   useEffect(() => {
     if (!room?.id) return;
     fetchRoomScores(room.id).then(setScores);
   }, [room?.id]);
+
+  const handlePlay = () => {
+    setUserInRoom(true);
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -74,7 +82,7 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
-      <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm" hidden={userInRoom}>
         <h2 className="text-lg sm:text-xl font-bold mb-4">About your session</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
@@ -179,6 +187,13 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           className="flex-1 gap-2"
+          onClick={handlePlay}
+        >
+          <Play size={16} />
+          Play
+        </Button>
+        <Button
+          className="flex-1 gap-2"
           variant="secondary"
           onClick={handleCopyLink}
         >
@@ -193,6 +208,10 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
           <Trash2 size={16} />
           Close room
         </Button>
+      </div>
+
+      <div id="game-section" hidden={!userInRoom}>
+        <GameSection room={room} session={session} />
       </div>
     </div>
   );

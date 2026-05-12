@@ -59,7 +59,7 @@ export const RoomDisplayer = () => {
   return (
     <div className="flex flex-col gap-2 m-1 w-full p-4">
       {isOwner ? (
-        <OwnerScreenForRoom room={room} />
+        <OwnerScreenForRoom room={room} session={session} />
       ) : (
         <PlayerScreenForRoom room={room} session={session}/>
       )}
