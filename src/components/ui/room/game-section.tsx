@@ -1,6 +1,6 @@
 "use client";
 import { Resume } from "./resume";
-import { updateUserScore, getQuestions } from "@/utils/func";
+import { updateUserScore, getQuestions, submitRoomScore } from "@/utils/func";
 import { Badge } from "../shadcn-component/badge";
 import { toast } from "react-hot-toast";
 
@@ -103,6 +103,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
     } else {
       toast.success(`Thanks for playing! Your score is ${currentScore}pts... we will update your ranking soon.`);
       await updateUserScore(currentScore, session?.user.id || "");
+      await submitRoomScore(room?.id || "", session?.user.id || "", currentScore, true);
       setIsGameFinished(true);
     }
   };
