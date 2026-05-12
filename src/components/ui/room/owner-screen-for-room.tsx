@@ -1,5 +1,5 @@
 import { Question, Room } from "@/types/db";
-import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare, Trophy, Play } from "lucide-react";
+import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare, Trophy, Play, Archive } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -74,8 +74,8 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
     { label: "Questions", value: room?.questionCount || room?.questions.length },
     {
       label: "Status",
-      value: room?.winner ? "Finished" : "Open",
-      icon: room?.winner ? <CircleX size={16} className="text-red-500" /> : <RefreshCw size={16} className="text-green-500 animate-spin" />,
+      value: room?.winner ? "Finished" : room?.closed ? "Closed" : "Open",
+      icon: room?.winner ? <CircleX size={16} className="text-red-500" /> : room?.closed ? <Archive size={16} className="text-muted-foreground" /> : <RefreshCw size={16} className="text-green-500 animate-spin" />,
     },
     { label: "Winner", value: room?.winner?.email || "No winner yet" },
   ];
