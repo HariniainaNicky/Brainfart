@@ -174,7 +174,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
             <ul className="flex flex-col gap-3 w-full max-w-md">
               {randomAnswer.map((answer: string, i) => (
                 <motion.div
-                  key={answer}
+                  key={`answer-${i}`}
                   custom={i}
                   variants={answerVariants}
                   initial="hidden"
