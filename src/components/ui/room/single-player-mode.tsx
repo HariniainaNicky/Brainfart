@@ -1,5 +1,5 @@
 "use client"
-import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions } from "@/utils/func";
+import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions, updateUserScore } from "@/utils/func";
 import { useEffect } from "react";
 import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
@@ -12,6 +12,7 @@ import { Question } from "@/types/db";
 import { useState } from "react";
 import { AddAndRemoveButton } from "../button/add-and-remove-button";
 import { motion, AnimatePresence } from "motion/react";
+import { authClient } from "@/lib/auth-client";
 
 type MyAnswersVSTheAnswers = { myAnswers: string[], theAnswers: string[], questions: string[] };
 
@@ -25,6 +26,7 @@ const answerVariants = {
 };
 
 export const SinglePlayerMode = () => {
+  const { data: session } = authClient.useSession();
   const [startGame, setStartGame] = useState(false);
   const [typeId, setTypeId] = useState<string>("null");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -95,6 +97,7 @@ export const SinglePlayerMode = () => {
       setCurrentQuestionCount((prev) => prev + 1);
     } else {
       toast.success(`Thanks for playing! Your score is ${currentScore}pts.`);
+      await updateUserScore(currentScore, session?.user.id || "");
       setIsGameFinished(true);
     }
   };
