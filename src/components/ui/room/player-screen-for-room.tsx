@@ -66,7 +66,7 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
 
   const infoItems = [
     { label: "Title", value: room?.title },
-    { label: "Questions", value: room?.questions.length },
+    { label: "Questions", value: room?.questionCount || room?.questions.length },
     {
       label: "Status",
       value: room?.winner ? "Finished" : "Open",

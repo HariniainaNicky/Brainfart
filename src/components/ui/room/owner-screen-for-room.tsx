@@ -50,7 +50,7 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
 
   const infoItems = [
     { label: "Title", value: room?.title },
-    { label: "Questions", value: room?.questions.length },
+    { label: "Questions", value: room?.questionCount || room?.questions.length },
     {
       label: "Status",
       value: room?.winner ? "Finished" : "Open",
@@ -104,12 +104,23 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
                     Questions
                   </span>
                   <div className="flex flex-col gap-2 max-h-60 overflow-y-auto rounded-lg border border-border p-3">
-                    {room?.questions.map((question: Question, index: number) => (
-                      <div key={index} className="text-sm py-1.5 border-b border-border last:border-0">
-                        <span className="text-muted-foreground mr-2">#{index + 1}</span>
-                        {question.question}
+                    {room?.questions && room.questions.length > 0 ? (
+                      room.questions.map((question: Question, index: number) => (
+                        <div key={index} className="text-sm py-1.5 border-b border-border last:border-0">
+                          <span className="text-muted-foreground mr-2">#{index + 1}</span>
+                          {question.question}
+                        </div>
+                      ))
+                    ) : room?.questionTypeId ? (
+                      <div className="text-sm text-muted-foreground py-4 text-center">
+                        Generated each time you play<br />
+                        <span className="font-medium text-foreground">{room.questionCount} questions</span>
                       </div>
-                    ))}
+                    ) : (
+                      <div className="text-sm text-muted-foreground py-4 text-center">
+                        No questions configured
+                      </div>
+                    )}
                   </div>
                 </div>
               </CarouselItem>

@@ -27,6 +27,8 @@ export type Room = {
     questions: Question[];
     players: User[];
     startDate: Date;
+    questionTypeId?: string | null;
+    questionCount: number;
     openedById: string;
     openedBy: User;
 };
