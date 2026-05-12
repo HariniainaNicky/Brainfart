@@ -7,6 +7,9 @@ import { auth } from "@/lib/auth";
 export const GET = async () => {
   try {
     const rooms = await prisma.room.findMany({
+      where: {
+        closed: false,
+      },
       include: {
         openedBy: true,
         players: true,

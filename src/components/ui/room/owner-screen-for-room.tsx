@@ -11,7 +11,7 @@ import {
 } from "../shadcn-component/carousel";
 import { PlayerList } from "./player-list";
 import { Button } from "../shadcn-component/button";
-import { deleteRoomById, fetchRoomScores } from "@/utils/func";
+import { closeRoomById, fetchRoomScores } from "@/utils/func";
 import toast from "react-hot-toast";
 import { PartUnderConstruction } from "../chore-component/part-under-construction";
 import { GameSection } from "./game-section";
@@ -56,7 +56,7 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
 
   const handleDeleteRoom = async () => {
     try {
-      const data = await deleteRoomById(room?.id || "");
+      const data = await closeRoomById(room?.id || "");
       if (data.message) {
         toast.success(data.message, { id: "delete-room" });
         router.push("/room");
