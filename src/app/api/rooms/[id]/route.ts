@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { deleteRoom, getRoomById } from "@/services/room";
+import { closeRoom, getRoomById } from "@/services/room";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRoomOwnership } from "@/lib/auth-utils";
@@ -68,10 +68,10 @@ export const DELETE = async (
     const authCheck = await verifyRoomOwnership(roomId);
     if (authCheck) return authCheck;
 
-    await deleteRoom(roomId);
+    await closeRoom(roomId);
     return NextResponse.json(
       {
-        message: "Room deleted successfully",
+        message: "Room closed successfully",
       },
       { status: 200 },
     );

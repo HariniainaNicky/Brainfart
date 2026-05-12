@@ -1,6 +1,6 @@
 "use client";
 import { Resume } from "./resume";
-import { updateUserScore, getQuestions } from "@/utils/func";
+import { updateUserScore, getQuestions, submitRoomScore } from "@/utils/func";
 import { Badge } from "../shadcn-component/badge";
 import { toast } from "react-hot-toast";
 
@@ -12,17 +12,29 @@ import { Button } from "../shadcn-component/button";
 import { useEffect, useState } from "react";
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray } from "@/utils/func";
 import { Session } from "@/types/better-auth";
+import { motion, AnimatePresence } from "motion/react";
 
 type GameSectionProps = {
   room: Room | undefined;
-  session: Session
+  session: Session;
+  onBack?: () => void;
 };
 
 type MyAnswersVSTheAnswers = { myAnswers: string[], theAnswers: string[], questions: string[] };
 
-export const GameSection = ({ room, session }: GameSectionProps) => {
+const answerVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.2 },
+  }),
+};
+
+export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [checkedAnswer, setCheckedAnswer] = useState<string[]>([]);
   const [randomAnswer, setRandomAnswer] = useState<string[]>([]);
@@ -31,12 +43,14 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
 
   useEffect(() => {
     const fetchGameQuestions = async () => {
-      if (room?.questionCount && room?.questionTypeId) {
-        const qs = await getQuestions(room.questionCount, room.questionTypeId);
+      setQuestionsLoading(true);
+      if (room?.questionCount) {
+        const qs = await getQuestions(room.questionCount, room.questionTypeId || null);
         setQuestions(qs);
       } else if (room?.questions?.length) {
         setQuestions(room.questions);
       }
+      setQuestionsLoading(false);
     };
     fetchGameQuestions();
   }, [room?.id]);
@@ -61,6 +75,14 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
 
     fetchRandomAnswer();
   }, [currentQuestionCount, questions]);
+
+  if (questionsLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return null;
@@ -92,6 +114,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
     } else {
       toast.success(`Thanks for playing! Your score is ${currentScore}pts... we will update your ranking soon.`);
       await updateUserScore(currentScore, session?.user.id || "");
+      await submitRoomScore(room?.id || "", session?.user.id || "", currentScore, true);
       setIsGameFinished(true);
     }
   };
@@ -100,56 +123,101 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
     <div className="flex flex-col gap-4">
       {room && <h2 className="text-2xl font-bold text-center">{room.title}</h2>}
 
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-primary"
+            layout
+            transition={{ duration: 0.3 }}
+            style={{ width: `${((currentQuestionCount + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+        <motion.span
+          key={currentScore}
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ duration: 0.3 }}
+          className="text-sm font-bold shrink-0 tabular-nums"
+        >
+          {currentScore}pts
+        </motion.span>
+      </div>
+
       <Separator />
 
       <form
-        className="flex flex-col gap-4 justify-center items-center"
+        className="flex flex-col gap-4 justify-center items-center w-full"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
         hidden={isGameFinished}
       >
-        <div className="flex flex-col gap-2">
-          <Badge variant="outline" className="self-center">
-            {question.typeId?.split("-")[1]?.toUpperCase() || "MISC"}
-          </Badge>
-          <p className="text-lg text-center font-medium">{question.question}</p>
-        </div>
-
-        <ul className="flex flex-col gap-3">
-          {randomAnswer.map((answer: string, id) => (
-            <div className="flex items-center gap-3" key={id}>
-              <Checkbox
-                id={String(id)}
-                checked={checkedAnswer.includes(answer)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setCheckedAnswer((prev) => [...prev, answer]);
-                  } else {
-                    setCheckedAnswer((prev) => prev.filter((a) => a !== answer));
-                  }
-                }}
-              />
-              <Label htmlFor={String(id)} className="text-md">
-                {answer}
-              </Label>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentQuestionCount}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.25 }}
+            className="flex flex-col gap-4 items-center w-full"
+          >
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">
+                {question.typeId?.split("-")[1]?.toUpperCase() || "MISC"}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                {currentQuestionCount + 1} / {questions.length}
+              </span>
             </div>
-          ))}
-        </ul>
+            <p className="text-lg text-center font-medium">{question.question}</p>
 
-        <Button type="submit" className="self-center">
-          Submit
-        </Button>
-        <Button
-          onClick={() => setCurrentQuestionCount((p) => p + 1)}
-          disabled={currentQuestionCount === questions.length - 1}
-        >
-          Next question
-        </Button>
+            <ul className="flex flex-col gap-3 w-full max-w-md">
+              {randomAnswer.map((answer: string, i) => (
+                <motion.div
+                  key={`answer-${i}`}
+                  custom={i}
+                  variants={answerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:border-primary/50 has-[:checked]:border-primary"
+                >
+                  <Checkbox
+                    id={String(i)}
+                    checked={checkedAnswer.includes(answer)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setCheckedAnswer((prev) => [...prev, answer]);
+                      } else {
+                        setCheckedAnswer((prev) => prev.filter((a) => a !== answer));
+                      }
+                    }}
+                  />
+                  <Label htmlFor={String(i)} className="text-md cursor-pointer flex-1">
+                    {answer}
+                  </Label>
+                </motion.div>
+              ))}
+            </ul>
+
+            <div className="flex gap-3">
+              <Button type="submit" className="self-center">
+                Submit
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCurrentQuestionCount((p) => p + 1)}
+                disabled={currentQuestionCount === questions.length - 1}
+              >
+                Next
+              </Button>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </form>
 
-      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions}/> : null }
+      { isGameFinished ? <Resume myAnswers={myAnswers.myAnswers} theAnswers={myAnswers.theAnswers} questions={myAnswers.questions} onBack={onBack}/> : null }
     </div>
   );
 };

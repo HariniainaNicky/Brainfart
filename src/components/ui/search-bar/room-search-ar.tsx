@@ -7,16 +7,16 @@ type RoomSearchBarProps = {
   searchedRooms: string
 }
 
-export const RoomSearchBar = (props: RoomSearchBarProps) => {
+export const RoomSearchBar = ({ searchedRooms, setSearchedRooms }: RoomSearchBarProps) => {
   return (
     <div className="flex gap-2">
       <Input
         placeholder="Search for a game..."
-        value={props.searchedRooms}
-        onChange={(e) => props.setSearchedRooms(e.target.value)}
+        value={searchedRooms}
+        onChange={(e) => setSearchedRooms(e.target.value)}
       />
-      {props.searchedRooms && (
-        <Button variant="outline" onClick={() => props.setSearchedRooms("")}>
+      {searchedRooms && (
+        <Button variant="outline" onClick={() => setSearchedRooms("")}>
           Clear
         </Button>
       )}

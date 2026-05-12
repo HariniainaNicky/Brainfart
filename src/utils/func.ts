@@ -189,6 +189,16 @@ export const fetchRoomById = async (userId: string) => {
     }
 };
 
+export const fetchClosedRooms = async () => {
+    try {
+        const res = await fetch("/api/rooms?closed=true");
+        const data = await res.json();
+        return data.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const insertRoomPlayer = async (roomId: string, userId: string) => {
     try {
         const url = `/api/rooms/${roomId}/players`;
@@ -219,7 +229,7 @@ export const fetchMissingField = async (userId: string) => {
     }
 };
 
-export const deleteRoomById = async (roomId: string) => {
+export const closeRoomById = async (roomId: string) => {
     try {
         const url = `/api/rooms/${roomId}`;
         const res = await fetch(url, {
@@ -240,6 +250,31 @@ export const quitRoom = async (roomId: string, userId: string) => {
         });
         const data = await res.json();
         return data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const submitRoomScore = async (roomId: string, userId: string, score: number, finished: boolean) => {
+    try {
+        const url = `/api/rooms/${roomId}/scores`;
+        const res = await fetch(url, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, score, finished }),
+        });
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const fetchRoomScores = async (roomId: string) => {
+    try {
+        const url = `/api/rooms/${roomId}/scores`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.data;
     } catch (error) {
         console.log(error);
     }

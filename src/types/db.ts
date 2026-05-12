@@ -29,6 +29,7 @@ export type Room = {
     startDate: Date;
     questionTypeId?: string | null;
     questionCount: number;
+    closed?: boolean;
     openedById: string;
     openedBy: User;
 };
