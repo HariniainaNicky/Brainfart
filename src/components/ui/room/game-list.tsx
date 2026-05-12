@@ -76,7 +76,7 @@ export const GameList = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   onClick={() => router.push(`/room/${room.id}`)}
-                  className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 cursor-pointer transition-all duration-200 hover:border-primary/30 hover:shadow-[0_0_12px_-4px_hsl(var(--primary))]"
+                  className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 cursor-pointer transition-all duration-200 hover:border-primary/30 hover:shadow-md hover:ring-1 hover:ring-primary/30"
                 >
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <p className="text-base md:text-lg font-semibold truncate">
