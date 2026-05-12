@@ -4,12 +4,18 @@ import { Button } from "../shadcn-component/button";
 import { PlayerList } from "./player-list";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { insertRoomPlayer } from "@/utils/func";
+import { insertRoomPlayer, fetchRoomScores } from "@/utils/func";
 import { authClient } from "@/lib/auth-client";
-import { CircleX, RefreshCw, LogIn, LogOut, Play, User as UserIcon } from "lucide-react";
+import { CircleX, RefreshCw, LogIn, LogOut, Play, User as UserIcon, Trophy } from "lucide-react";
 import { quitRoom } from "@/utils/func";
 import { GameSection } from "./game-section";
 import { Session } from "@/types/better-auth";
+
+type RoomScore = {
+  score: number;
+  finished: boolean;
+  user: { id: string; username: string | null; email: string; image: string | null };
+};
 
 type PlayerScreenForRoomProps = {
   room: Room | undefined;
@@ -20,6 +26,12 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
   const [userInRoom, setGameStarted] = useState<boolean>(false);
   const router = useRouter();
   const [isUserInRoom, setIsUserInRoom] = useState<boolean>(false);
+  const [scores, setScores] = useState<RoomScore[]>([]);
+
+  useEffect(() => {
+    if (!room?.id) return;
+    fetchRoomScores(room.id).then(setScores);
+  }, [room?.id]);
 
   const verifyUserInRoom = async () => {
     const inRoom = room?.players.some(
@@ -107,6 +119,28 @@ export const PlayerScreenForRoom = ({ room, session }: PlayerScreenForRoomProps)
             Players
           </span>
           <PlayerList players={room?.players} />
+        </div>
+
+        <div className="flex flex-col gap-2 mb-6">
+          <span className="text-sm font-semibold flex items-center gap-1.5">
+            <Trophy size={14} />
+            Scores
+          </span>
+          <div className="flex flex-col gap-1 rounded-lg border border-border p-3 max-h-40 overflow-y-auto">
+            {scores.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-2">No scores yet</p>
+            ) : (
+              scores.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between text-sm py-1 border-b border-border last:border-0">
+                  <span className="flex items-center gap-2">
+                    <span className="text-muted-foreground w-4">#{i + 1}</span>
+                    {entry.user.username || entry.user.email}
+                  </span>
+                  <span className="font-semibold">{entry.score}pts</span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">

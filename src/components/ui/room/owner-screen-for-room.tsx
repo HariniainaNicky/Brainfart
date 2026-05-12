@@ -1,6 +1,7 @@
 import { Question, Room } from "@/types/db";
-import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare } from "lucide-react";
+import { CircleX, RefreshCw, Copy, Trash2, User, HelpCircle, MessageSquare, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -10,9 +11,15 @@ import {
 } from "../shadcn-component/carousel";
 import { PlayerList } from "./player-list";
 import { Button } from "../shadcn-component/button";
-import { deleteRoomById } from "@/utils/func";
+import { deleteRoomById, fetchRoomScores } from "@/utils/func";
 import toast from "react-hot-toast";
 import { PartUnderConstruction } from "../chore-component/part-under-construction";
+
+type RoomScore = {
+  score: number;
+  finished: boolean;
+  user: { id: string; username: string | null; email: string; image: string | null };
+};
 
 type OwnerScreenForRoomProps = {
   room: Room | undefined;
@@ -20,6 +27,12 @@ type OwnerScreenForRoomProps = {
 
 export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
   const router = useRouter();
+  const [scores, setScores] = useState<RoomScore[]>([]);
+
+  useEffect(() => {
+    if (!room?.id) return;
+    fetchRoomScores(room.id).then(setScores);
+  }, [room?.id]);
 
   const handleCopyLink = async () => {
     try {
@@ -131,6 +144,29 @@ export const OwnerScreenForRoom = ({ room }: OwnerScreenForRoomProps) => {
                     Chat
                   </span>
                   <PartUnderConstruction />
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-semibold flex items-center gap-1.5">
+                    <Trophy size={14} />
+                    Scores
+                  </span>
+                  <div className="flex flex-col gap-2 max-h-60 overflow-y-auto rounded-lg border border-border p-3">
+                    {scores.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">No scores yet</p>
+                    ) : (
+                      scores.map((entry, i) => (
+                        <div key={i} className="flex items-center justify-between text-sm py-1.5 border-b border-border last:border-0">
+                          <span className="flex items-center gap-2">
+                            <span className="text-muted-foreground w-4">#{i + 1}</span>
+                            {entry.user.username || entry.user.email}
+                          </span>
+                          <span className="font-semibold">{entry.score}pts</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </CarouselItem>
             </CarouselContent>
