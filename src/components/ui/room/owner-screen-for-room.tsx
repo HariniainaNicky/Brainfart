@@ -182,32 +182,32 @@ export const OwnerScreenForRoom = ({ room, session }: OwnerScreenForRoomProps) =
             <CarouselNext className="hidden md:flex" />
           </Carousel>
         </div>
-      </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Button
-          className="flex-1 gap-2"
-          onClick={handlePlay}
-        >
-          <Play size={16} />
-          Play
-        </Button>
-        <Button
-          className="flex-1 gap-2"
-          variant="secondary"
-          onClick={handleCopyLink}
-        >
-          <Copy size={16} />
-          Copy link
-        </Button>
-        <Button
-          className="flex-1 gap-2"
-          variant="destructive"
-          onClick={handleDeleteRoom}
-        >
-          <Trash2 size={16} />
-          Close room
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            className="flex-1 gap-2"
+            onClick={handlePlay}
+          >
+            <Play size={16} />
+            Play
+          </Button>
+          <Button
+            className="flex-1 gap-2"
+            variant="secondary"
+            onClick={handleCopyLink}
+          >
+            <Copy size={16} />
+            Copy link
+          </Button>
+          <Button
+            className="flex-1 gap-2"
+            variant="destructive"
+            onClick={handleDeleteRoom}
+          >
+            <Trash2 size={16} />
+            Close room
+          </Button>
+        </div>
       </div>
 
       <div id="game-section" hidden={!userInRoom}>
