@@ -13,32 +13,34 @@ import { Users } from "lucide-react";
 export const GameList = () => {
   const router = useRouter();
 
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchRooms = async () => {
-    setLoading(true);
-    const response = await fetch("/api/rooms");
-    const data = await response.json();
-    let filteredData: Room[];
-    if (searchedRooms === "") {
-      filteredData = data.data;
-    } else {
-      filteredData = filterSearchRoom(data.data, searchedRooms);
-    }
-
-    setRooms(filteredData);
-    setLoading(false);
-  };
+  useEffect(() => {
+    const fetchRooms = async () => {
+      setLoading(true);
+      const response = await fetch("/api/rooms");
+      const data = await response.json();
+      setAllRooms(data.data);
+      setRooms(data.data);
+      setLoading(false);
+    };
+    fetchRooms();
+  }, []);
 
   useEffect(() => {
-    fetchRooms();
-  }, [searchedRooms]);
+    if (searchedRooms === "") {
+      setRooms(allRooms);
+    } else {
+      setRooms(filterSearchRoom(allRooms, searchedRooms));
+    }
+  }, [searchedRooms, allRooms]);
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
-      <RoomSearchBar loading={loading} setSearchedRooms={setSearchedRooms} />
+      <RoomSearchBar searchedRooms={searchedRooms} setSearchedRooms={setSearchedRooms} />
       <h3 className="text-lg md:text-xl font-semibold text-center sm:text-left">
         Available rooms
       </h3>
