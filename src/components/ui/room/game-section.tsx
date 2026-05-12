@@ -23,6 +23,7 @@ type MyAnswersVSTheAnswers = { myAnswers: string[], theAnswers: string[], questi
 export const GameSection = ({ room, session }: GameSectionProps) => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [checkedAnswer, setCheckedAnswer] = useState<string[]>([]);
   const [randomAnswer, setRandomAnswer] = useState<string[]>([]);
@@ -31,12 +32,14 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
 
   useEffect(() => {
     const fetchGameQuestions = async () => {
-      if (room?.questionCount && room?.questionTypeId) {
-        const qs = await getQuestions(room.questionCount, room.questionTypeId);
+      setQuestionsLoading(true);
+      if (room?.questionCount) {
+        const qs = await getQuestions(room.questionCount, room.questionTypeId || null);
         setQuestions(qs);
       } else if (room?.questions?.length) {
         setQuestions(room.questions);
       }
+      setQuestionsLoading(false);
     };
     fetchGameQuestions();
   }, [room?.id]);
@@ -61,6 +64,14 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
 
     fetchRandomAnswer();
   }, [currentQuestionCount, questions]);
+
+  if (questionsLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return null;
