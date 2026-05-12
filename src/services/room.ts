@@ -62,10 +62,13 @@ export const quitRoom = async (roomId: string, userId: string) => {
   });
 };
 
-export const deleteRoom = async (roomId: string) => {
-  await prisma.room.delete({
+export const closeRoom = async (roomId: string) => {
+  await prisma.room.update({
     where: {
       id: roomId,
+    },
+    data: {
+      closed: true,
     },
   });
 };
