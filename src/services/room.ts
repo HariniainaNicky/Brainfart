@@ -1,24 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { v4 } from "uuid";
-import { Question } from "@/types/db";
 import { RoomDto } from "@/types/dto";
 
 export const createRoom = async (data: RoomDto, userId: string) => {
-  const questionsId: { id: string }[] = data.questions.map(
-    (question: Question) => {
-      return { id: question.id };
-    },
-  );
-
   const roomId = v4();
 
   await prisma.room.create({
     data: {
       id: roomId,
       title: data.title,
-      questions: {
-        connect: questionsId,
-      },
+      chronoTiming: data.chronoTiming,
+      questionTypeId: data.questionTypeId,
+      questionCount: data.questionCount,
       openedById: userId,
       players: {
         connect: [{ id: userId }],
