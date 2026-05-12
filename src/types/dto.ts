@@ -1,8 +1,8 @@
-import { Question } from "./db";
-
 export type RoomDto = {
   title: string;
-  questions: Question[];
+  questionTypeId: string | null;
+  questionCount: number;
+  chronoTiming: number;
 };
 
 // I created this one for BetterAuth

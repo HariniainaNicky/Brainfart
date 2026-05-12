@@ -1,12 +1,11 @@
 "use client";
 import { Resume } from "./resume";
-import { updateUserScore } from "@/utils/func";
+import { updateUserScore, getQuestions } from "@/utils/func";
 import { Badge } from "../shadcn-component/badge";
-import { authClient } from "@/lib/auth-client";
 import { toast } from "react-hot-toast";
 
-import { Room } from "@/types/db";
-import { Checkbox } from "../shadcn-component/checkbox"; // shadcn
+import { Question, Room } from "@/types/db";
+import { Checkbox } from "../shadcn-component/checkbox";
 import { Label } from "../shadcn-component/label";
 import { Separator } from "../shadcn-component/separator";
 import { Button } from "../shadcn-component/button";
@@ -23,7 +22,7 @@ type MyAnswersVSTheAnswers = { myAnswers: string[], theAnswers: string[], questi
 
 export const GameSection = ({ room, session }: GameSectionProps) => {
   const [isGameFinished, setIsGameFinished] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState<string[]>();
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [checkedAnswer, setCheckedAnswer] = useState<string[]>([]);
   const [randomAnswer, setRandomAnswer] = useState<string[]>([]);
@@ -31,8 +30,20 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
   const [myAnswers, setMyAnswers] = useState<MyAnswersVSTheAnswers>({ myAnswers: [], theAnswers: [], questions: [] });
 
   useEffect(() => {
-    if (!room) return;
-    const question = room.questions[currentQuestionCount];
+    const fetchGameQuestions = async () => {
+      if (room?.questionCount && room?.questionTypeId) {
+        const qs = await getQuestions(room.questionCount, room.questionTypeId);
+        setQuestions(qs);
+      } else if (room?.questions?.length) {
+        setQuestions(room.questions);
+      }
+    };
+    fetchGameQuestions();
+  }, [room?.id]);
+
+  useEffect(() => {
+    if (questions.length === 0) return;
+    const question = questions[currentQuestionCount];
     if (!question) return;
 
     const fetchRandomAnswer = async () => {
@@ -49,13 +60,13 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
     };
 
     fetchRandomAnswer();
-  }, [currentQuestionCount, room]);
+  }, [currentQuestionCount, questions]);
 
-  if (!room || !room.questions[currentQuestionCount]) {
+  if (questions.length === 0) {
     return null;
   }
 
-  const question = room.questions[currentQuestionCount];
+  const question = questions[currentQuestionCount];
 
   const handleSubmit = async () => {
     if (checkedAnswer.length === 1 && checkedAnswer[0] === question.Answer) {
@@ -76,7 +87,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
         theAnswers: [...prev.theAnswers, question.Answer], questions: [...prev.questions, question.question] })
     );
 
-    if (currentQuestionCount < room.questions.length - 1) {
+    if (currentQuestionCount < questions.length - 1) {
       setCurrentQuestionCount((prev) => prev + 1);
     } else {
       toast.success(`Thanks for playing! Your score is ${currentScore}pts... we will update your ranking soon.`);
@@ -87,7 +98,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold text-center">{room.title}</h2>
+      {room && <h2 className="text-2xl font-bold text-center">{room.title}</h2>}
 
       <Separator />
 
@@ -101,7 +112,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
       >
         <div className="flex flex-col gap-2">
           <Badge variant="outline" className="self-center">
-            {question.typeId.split("-")[1].toUpperCase()}
+            {question.typeId?.split("-")[1]?.toUpperCase() || "MISC"}
           </Badge>
           <p className="text-lg text-center font-medium">{question.question}</p>
         </div>
@@ -132,7 +143,7 @@ export const GameSection = ({ room, session }: GameSectionProps) => {
         </Button>
         <Button
           onClick={() => setCurrentQuestionCount((p) => p + 1)}
-          disabled={currentQuestionCount === room.questions.length - 1}
+          disabled={currentQuestionCount === questions.length - 1}
         >
           Next question
         </Button>
