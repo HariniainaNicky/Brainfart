@@ -189,6 +189,16 @@ export const fetchRoomById = async (userId: string) => {
     }
 };
 
+export const fetchClosedRooms = async () => {
+    try {
+        const res = await fetch("/api/rooms?closed=true");
+        const data = await res.json();
+        return data.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const insertRoomPlayer = async (roomId: string, userId: string) => {
     try {
         const url = `/api/rooms/${roomId}/players`;

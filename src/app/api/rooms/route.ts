@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createRoom } from "@/services/room";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
-export const GET = async () => {
+export const GET = async (req: NextRequest) => {
   try {
+    const showClosed = req.nextUrl.searchParams.get("closed") === "true";
+
     const rooms = await prisma.room.findMany({
       where: {
-        closed: false,
+        closed: showClosed,
       },
       include: {
         openedBy: true,

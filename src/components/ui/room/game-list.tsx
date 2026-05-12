@@ -5,40 +5,57 @@ import { useEffect, useState } from "react";
 import { RoomSearchBar } from "../search-bar/room-search-ar";
 import { Spinner } from "../shadcn-component/spinner";
 import { Room } from "@/types/db";
-import { filterSearchRoom } from "@/utils/func";
+import { filterSearchRoom, fetchClosedRooms } from "@/utils/func";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { Users } from "lucide-react";
+import { Users, Archive } from "lucide-react";
 
 export const GameList = () => {
   const router = useRouter();
 
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
-  const fetchRooms = async () => {
-    setLoading(true);
-    const response = await fetch("/api/rooms");
-    const data = await response.json();
-    let filteredData: Room[];
-    if (searchedRooms === "") {
-      filteredData = data.data;
-    } else {
-      filteredData = filterSearchRoom(data.data, searchedRooms);
-    }
-
-    setRooms(filteredData);
-    setLoading(false);
-  };
+  const [closedRooms, setClosedRooms] = useState<Room[]>([]);
+  const [showClosed, setShowClosed] = useState(false);
+  const [closedLoading, setClosedLoading] = useState(false);
 
   useEffect(() => {
+    const fetchRooms = async () => {
+      setLoading(true);
+      const response = await fetch("/api/rooms");
+      const data = await response.json();
+      setAllRooms(data.data);
+      setRooms(data.data);
+      setLoading(false);
+    };
     fetchRooms();
-  }, [searchedRooms]);
+  }, []);
+
+  useEffect(() => {
+    if (searchedRooms === "") {
+      setRooms(allRooms);
+    } else {
+      setRooms(filterSearchRoom(allRooms, searchedRooms));
+    }
+  }, [searchedRooms, allRooms]);
+
+  const handleShowClosed = async () => {
+    if (showClosed) {
+      setShowClosed(false);
+      return;
+    }
+    setClosedLoading(true);
+    const data = await fetchClosedRooms();
+    setClosedRooms(data || []);
+    setClosedLoading(false);
+    setShowClosed(true);
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
-      <RoomSearchBar loading={loading} setSearchedRooms={setSearchedRooms} />
+      <RoomSearchBar searchedRooms={searchedRooms} setSearchedRooms={setSearchedRooms} />
       <h3 className="text-lg md:text-xl font-semibold text-center sm:text-left">
         Available rooms
       </h3>
@@ -96,6 +113,67 @@ export const GameList = () => {
           </div>
         )}
       </ScrollArea>
+
+      <Button
+        variant="outline"
+        className="gap-2 self-center"
+        onClick={handleShowClosed}
+      >
+        <Archive size={16} />
+        {showClosed ? "Hide closed rooms" : "Show closed rooms"}
+      </Button>
+
+      {showClosed && (
+        <div className="flex flex-col gap-3">
+          <h3 className="text-lg md:text-xl font-semibold text-center sm:text-left">
+            Closed rooms
+          </h3>
+
+          {closedLoading ? (
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
+          ) : closedRooms.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No closed rooms</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {closedRooms.map((room, index) => (
+                <motion.div
+                  key={room.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  onClick={() => router.push(`/room/${room.id}`)}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 p-4 cursor-pointer transition-all duration-200 hover:border-primary/30 opacity-60"
+                >
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <p className="text-base md:text-lg font-semibold truncate">
+                      {room.title}
+                    </p>
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">
+                      {room.openedBy.email}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs text-muted-foreground font-medium">Closed</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/room/${room.id}`);
+                      }}
+                    >
+                      View
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
