@@ -175,7 +175,7 @@ export const copyToClipboard = async () => {
 // TODO: Search how to do generics with arrowed function
 export function filterSearchRoom(initialData: Room[], queryString: string) {
     return initialData.filter((room: Room) => {
-        return room.title.includes(queryString);
+        return room.title.toLowerCase().includes(queryString.toLowerCase());
     });
 }
 
