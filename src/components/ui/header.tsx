@@ -91,6 +91,11 @@ export const Header = (props: HeaderPropsType) => {
                 <Button variant="ghost" onClick={() => router.push("/contact")}>
                     Contact
                 </Button>
+                {props.logged ? (
+                    <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)}>
+                        Profile
+                    </Button>
+                ) : null}
             </ul>
 
             <div className="sm:hidden flex flex-row items-center m-3">
@@ -136,6 +141,14 @@ export const Header = (props: HeaderPropsType) => {
                             >
                                 Contact
                             </Button>
+                            {props.logged ? (
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => router.push(`/user/${props.session?.user?.id}`)}
+                                >
+                                    Profile
+                                </Button>
+                            ) : null}
                             {props.logged ? (
                                 <Button
                                     variant="ghost"
