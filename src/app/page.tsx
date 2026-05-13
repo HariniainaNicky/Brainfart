@@ -19,7 +19,7 @@ const Page = () => {
             setLogged(true);
             setUserData(session?.user);
         }
-    }, [session, setUserData, connect]);
+    }, [session, setUserData]);
 
     if (isPending) {
         return (
