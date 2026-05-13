@@ -5,20 +5,17 @@ import { Header } from "@/components/ui/header";
 import { authClient } from "@/lib/auth-client";
 import { useUser } from "@/stores/useUser";
 import { useState, useEffect } from "react";
-import { useSocketStore } from "@/stores/useSocketStore";
 import { Skeleton } from "@/components/ui/shadcn-component/skeleton";
 
 const Page = () => {
     const [logged, setLogged] = useState<boolean>(false);
     const { data: session, isPending } = authClient.useSession();
-    const { connect } = useSocketStore();
     const { setUserData } = useUser();
 
     useEffect(() => {
         if (!session) {
             setLogged(false);
         } else {
-            connect(session?.user?.id);
             setLogged(true);
             setUserData(session?.user);
         }

@@ -1,8 +1,11 @@
 'use client'
+import { ArrowLeft } from "lucide-react";
 import { YouNeedAnAccount } from "@/components/ui/chore-component/you-need-an-account";
 import { Header } from "@/components/ui/header";
 import { SettingBodyContent } from "@/components/ui/setting/setting-body-content";
+import { Button } from "@/components/ui/shadcn-component/button";
 import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/shadcn-component/skeleton";
 
@@ -31,6 +34,13 @@ const Page = () => {
   if (!session) return <YouNeedAnAccount />
   return <div>
     <Header logged={logged} session={session}/>
+    <div className="px-4 pt-2">
+      <Link href="/">
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </Link>
+    </div>
     <SettingBodyContent user={session?.user} session={session}/>
   </div>
 }
