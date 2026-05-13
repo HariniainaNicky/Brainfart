@@ -78,17 +78,12 @@ export const ProfilSettings = () => {
     const loadId = toast.loading("Updating...");
     setLoading(true);
 
-    let error: { message?: string } | undefined;
+    const result =
+      confirm.field === "email"
+        ? await authClient.changeEmail({ newEmail: confirm.value })
+        : await authClient.updateUser({ [confirm.field]: confirm.value });
 
-    if (confirm.field === "email") {
-      ({ error } = await authClient.changeEmail({
-        newEmail: confirm.value,
-      }));
-    } else {
-      ({ error } = await authClient.updateUser({
-        [confirm.field]: confirm.value,
-      }));
-    }
+    const error = result.error;
 
     if (error) {
       toast.error(error.message || "Something went wrong", { id: loadId });
