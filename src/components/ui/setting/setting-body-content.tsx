@@ -4,7 +4,6 @@ import { Button } from "../shadcn-component/button";
 import { ProfilBody } from "../profil/profil-body";
 import { Separator } from "../shadcn-component/separator";
 import { ProfilSettings } from "../profil/profil-setting";
-import { PartUnderConstruction } from "../chore-component/part-under-construction";
 import { Session } from "@/types/better-auth";
 import { AccountSetting } from "./account-setting";
 import { SessionSetting } from "./session-setting";
@@ -33,17 +32,13 @@ export const SettingBodyContent = ({
 }: SettingBodyContentProps) => {
   const [profilShowed, setProfilShowed] = useState(true);
   const [accountShowed, setAccountShowed] = useState(false);
-  const [accessibilityShowed, setAccessibilityShowed] = useState(false);
   const [sessionShowed, setSessionShowed] = useState(false);
-  const [appearanceShowed, setAppearanceShowed] = useState(false);
   const [adminDashboardShowed, setAdminDashboardShowed] = useState(false);
 
   const handleShow = (section: string) => {
     setProfilShowed(section === "profil");
     setAccountShowed(section === "account");
-    setAccessibilityShowed(section === "accessibility");
     setSessionShowed(section === "session");
-    setAppearanceShowed(section === "appearance");
     setAdminDashboardShowed(section === "Admin setting");
   };
 
@@ -66,25 +61,11 @@ export const SettingBodyContent = ({
           Account
         </Button>
         <Button
-          variant={accessibilityShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("accessibility")}
-          className="justify-start"
-        >
-          Accessibility
-        </Button>
-        <Button
           variant={sessionShowed ? "outline" : "ghost"}
           onClick={() => handleShow("session")}
           className="justify-start"
         >
           Session
-        </Button>
-        <Button
-          variant={appearanceShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("appearance")}
-          className="justify-start"
-        >
-          Appearance
         </Button>
         <Button
           variant={adminDashboardShowed ? "outline" : "ghost"}
@@ -110,21 +91,9 @@ export const SettingBodyContent = ({
           </div>
         )}
 
-        {accessibilityShowed && (
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
-            <PartUnderConstruction />
-          </div>
-        )}
-
         {sessionShowed && (
           <div className="flex-1 flex flex-col gap-4 min-h-0">
             <SessionSetting />
-          </div>
-        )}
-
-        {appearanceShowed && (
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
-            <PartUnderConstruction />
           </div>
         )}
 
