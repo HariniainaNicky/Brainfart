@@ -4,11 +4,11 @@ import { Toaster } from "react-hot-toast";
 import { BsBrightnessHigh } from "react-icons/bs";
 import { RiErrorWarningLine } from "react-icons/ri";
 
-// TODO: Add head for SEO later
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <html suppressHydrationWarning>
             <head>
+                <link rel="icon" href="/logo.png" />
                 <link
                     href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
                     rel="stylesheet"
