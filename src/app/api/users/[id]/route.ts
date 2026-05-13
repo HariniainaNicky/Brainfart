@@ -8,48 +8,52 @@ export const GET = async (
   _req: NextRequest,
   context: RouteContext<"/api/users/[id]">,
 ) => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const { id: userId } = await context.params;
-    const authCheck = await verifyOwnership(userId);
-    if (authCheck) return authCheck;
+
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    const isOwner = session?.user.id === userId;
+    const isUserAdmin = session?.user.role === "admin";
+
+    if (isOwner || isUserAdmin) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          accounts: true,
+          sessions: true,
+          openedRooms: true,
+          wonRooms: true,
+          joinedRooms: true,
+          notifications: true,
+        },
+      });
+
+      return NextResponse.json({ data: user }, { status: 200 });
+    }
 
     const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        accounts: true,
-        sessions: true,
-        openedRooms: true,
-        wonRooms: true,
-        joinedRooms: true,
-        notifications: true,
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        displayUsername: true,
+        image: true,
+        rank: true,
+        highestScore: true,
+        createdAt: true,
       },
     });
 
-    return NextResponse.json(
-      {
-        data: user,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json({ data: user }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      {
-        message: "Internal Server Error",
-      },
-      {
-        status: 500,
-      },
+      { message: "Internal Server Error" },
+      { status: 500 },
     );
   }
 };
