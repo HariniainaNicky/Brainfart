@@ -18,7 +18,7 @@ type Account = {
   createdAt: Date;
   id: string;
   providerId: string;
-  scope: string;
+  scopes: string[];
   updatedAt: Date;
 };
 
