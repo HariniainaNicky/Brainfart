@@ -1,5 +1,4 @@
 import "@/app/globals.css";
-import SocketProvider from "@/components/socket-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { BsBrightnessHigh } from "react-icons/bs";
