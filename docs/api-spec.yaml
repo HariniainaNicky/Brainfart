@@ -1,0 +1,1144 @@
+openapi: "3.0.3"
+info:
+  title: BrainFart API
+  description: Real-time multiplayer trivia game API
+  version: "1.0.0"
+servers:
+  - url: http://localhost:3000
+    description: Local development
+
+paths:
+  # ─── Auth ───────────────────────────────────────────────────────────────────
+  /api/auth/{+all}:
+    get:
+      tags: [Auth]
+      summary: Better Auth catch-all (GET routes: session, verify-email, etc.)
+      parameters:
+        - name: all
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Delegated to Better Auth }
+    post:
+      tags: [Auth]
+      summary: Better Auth catch-all (POST routes: sign-in, sign-up, sign-out, etc.)
+      parameters:
+        - name: all
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200": { description: Delegated to Better Auth }
+
+  # ─── Types ──────────────────────────────────────────────────────────────────
+  /api/types:
+    get:
+      tags: [Types]
+      summary: List all question types
+      responses:
+        "200":
+          description: Array of question types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Type"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Questions ──────────────────────────────────────────────────────────────
+  /api/questions:
+    get:
+      tags: [Questions]
+      summary: List validated questions (with search & type filter)
+      parameters:
+        - name: numberOfQuestion
+          in: query
+          schema: { type: integer, example: 10 }
+          description: If set, returns N random questions instead of all
+        - name: search
+          in: query
+          schema: { type: string }
+          description: Text search on question field (case-insensitive)
+        - name: typeId
+          in: query
+          schema: { type: string }
+          description: Filter by question type ID
+      responses:
+        "200":
+          description: Array of validated questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Question" } }
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      tags: [Questions]
+      summary: Create a new question (auth required)
+      security: [{ SessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question, score, isValidated, answer, userId]
+              properties:
+                question: { type: string }
+                score: { type: number }
+                isValidated: { type: boolean }
+                answer: { type: string }
+                userId: { type: string }
+      responses:
+        "200":
+          description: Question created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Question created successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/questions/{type}:
+    get:
+      tags: [Questions]
+      summary: Get random questions by type (or any type)
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string, nullable: true }
+          description: Type ID, or "null"/"undefined" for any type
+        - name: numberOfQuestion
+          in: query
+          schema: { type: integer, default: 1 }
+          description: Number of random questions to return
+      responses:
+        "200":
+          description: Array of random questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Question" } }
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/questions/randomAnswer:
+    get:
+      tags: [Questions]
+      summary: Get 3 random answers
+      responses:
+        "200":
+          description: Array of 3 random answers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Answer: { type: string }
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Rooms ──────────────────────────────────────────────────────────────────
+  /api/rooms:
+    get:
+      tags: [Rooms]
+      summary: List rooms
+      parameters:
+        - name: closed
+          in: query
+          schema: { type: string, enum: ["true", "false"] }
+          description: "If \"true\", show closed rooms; otherwise open rooms"
+      responses:
+        "200":
+          description: Array of rooms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Room" } }
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      tags: [Rooms]
+      summary: Create a room (auth required)
+      security: [{ SessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RoomDto" }
+      responses:
+        "200":
+          description: Room created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Room created successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/rooms/{id}:
+    get:
+      tags: [Rooms]
+      summary: Get room by ID (auth required)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Room details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Room" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    delete:
+      tags: [Rooms]
+      summary: Close room (owner or admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Room closed successfully (winner assigned)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Room closed successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Room not found
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/rooms/{id}/scores:
+    get:
+      tags: [Rooms]
+      summary: List scores for a room (auth required)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Scores sorted descending
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/RoomPlayerScore" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    patch:
+      tags: [Rooms]
+      summary: Upsert a player's score in a room (auth required)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, score, finished]
+              properties:
+                userId: { type: string }
+                score: { type: number }
+                finished: { type: boolean }
+      responses:
+        "200":
+          description: Score updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Score updated" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/rooms/{id}/players:
+    put:
+      tags: [Rooms]
+      summary: Add a player to a room (self-join or owner adds others)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: string }
+      responses:
+        "200":
+          description: User added to room
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "User inserted successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/rooms/{id}/players/{userId}:
+    put:
+      tags: [Rooms]
+      summary: Remove a player from a room (self-leave or owner kicks)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: User removed from room
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "User removed successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Users ──────────────────────────────────────────────────────────────────
+  /api/users:
+    get:
+      tags: [Users]
+      summary: List users with rank > 0, sorted by criteria
+      parameters:
+        - name: criteria
+          in: query
+          schema:
+            type: string
+            enum: [username, email, createdAt, rank, highestScore]
+            default: createdAt
+      responses:
+        "200":
+          description: Array of ranked users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/User" } }
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user profile with all relations (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Full user profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/UserFull" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    patch:
+      tags: [Users]
+      summary: Add score to user's highestScore (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [score]
+              properties:
+                score: { type: number }
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/User" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/users/{id}/session:
+    get:
+      tags: [Users]
+      summary: Get user's session record (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Session or null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Session" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/users/{id}/image:
+    patch:
+      tags: [Users]
+      summary: Update user avatar image URL (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image: { type: string, format: uri }
+      responses:
+        "200":
+          description: Image updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "User image updated successfully." }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/users/{id}/rank:
+    patch:
+      tags: [Users]
+      summary: Trigger global rank recalculation (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rank:
+                  type: number
+                  description: Accepted but ignored — rank is globally recalculated
+      responses:
+        "200":
+          description: Rank recalculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "User rank updated successfully." }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/users/{id}/account:
+    get:
+      tags: [Users]
+      summary: Get user's account record (owner or admin)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Account or null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Account" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Notifications ──────────────────────────────────────────────────────────
+  /api/notifications:
+    post:
+      tags: [Notifications]
+      summary: Create a notification (auth required)
+      security: [{ SessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, header, body]
+              properties:
+                userId: { type: string }
+                header: { type: string }
+                body: { type: string }
+      responses:
+        "201":
+          description: Notification created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Notification created successfully" }
+                  notification: { $ref: "#/components/schemas/Notification" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/notifications/{id}:
+    patch:
+      tags: [Notifications]
+      summary: Update notification fields (e.g. mark as seen) — owner or admin
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seen: { type: boolean }
+      responses:
+        "200":
+          description: Notification updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Notification updated successfully" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    delete:
+      tags: [Notifications]
+      summary: Soft-delete a notification — owner or admin
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Notification soft-deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Notification deleted successfully" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Admin: Rooms ───────────────────────────────────────────────────────────
+  /api/admin/rooms:
+    get:
+      tags: [Admin]
+      summary: List all rooms with pagination (admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+          description: Search by room title (case-insensitive)
+      responses:
+        "200":
+          description: Paginated rooms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdminRoom" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/admin/rooms/{id}:
+    delete:
+      tags: [Admin]
+      summary: Hard-delete a room with notification to owner (admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        "200":
+          description: Room deleted, owner notified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Room deleted successfully" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Admin: Users ───────────────────────────────────────────────────────────
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: List all users with pagination and filters (admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+          description: Search by name, username, or email (case-insensitive)
+        - name: role
+          in: query
+          schema: { type: string }
+          description: Filter by role
+        - name: banned
+          in: query
+          schema: { type: string, enum: ["true", "false"] }
+      responses:
+        "200":
+          description: Paginated users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdminUser" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/admin/users/{id}/ban:
+    patch:
+      tags: [Admin]
+      summary: Ban or unban a user (admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [banned]
+              properties:
+                banned: { type: boolean }
+                reason: { type: string }
+                expiresAt: { type: string, format: date-time }
+      responses:
+        "200":
+          description: User banned/unbanned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "User banned successfully" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ─── Admin: Questions ───────────────────────────────────────────────────────
+  /api/admin/questions/pending:
+    get:
+      tags: [Admin]
+      summary: List unvalidated questions with user & type info (admin only)
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200":
+          description: Pending questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Question"
+                        - type: object
+                          properties:
+                            user:
+                              type: object
+                              properties:
+                                id: { type: string }
+                                name: { type: string }
+                                username: { type: string, nullable: true }
+                            type:
+                              type: object
+                              properties:
+                                id: { type: string }
+                                name: { type: string }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/admin/questions/{id}/validate:
+    patch:
+      tags: [Admin]
+      summary: Approve or reject a question (admin only)
+      security: [{ SessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isValidated]
+              properties:
+                isValidated: { type: boolean }
+                score: { type: number }
+                typeId: { type: string, nullable: true }
+      responses:
+        "200":
+          description: Question validated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Question approved successfully" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: |
+        Better Auth session cookie. Obtained by signing in via POST /api/auth/sign-in.
+        The cookie name may vary (typically "better-auth.session_token" or "session_token").
+        Admins use the same mechanism; role is checked server-side.
+
+  schemas:
+    # ── Core Models ───────────────────────────────────────────────────────────
+    Type:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    Question:
+      type: object
+      properties:
+        id: { type: string }
+        question: { type: string }
+        typeId: { type: string, nullable: true }
+        Score: { type: number }
+        Answer: { type: string }
+        isValidated: { type: boolean }
+        userId: { type: string, nullable: true }
+        roomId: { type: string, nullable: true }
+
+    Room:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        startDate: { type: string, format: date-time }
+        chronoTiming: { type: number }
+        questionTypeId: { type: string, nullable: true }
+        questionCount: { type: number }
+        closed: { type: boolean }
+        openedById: { type: string }
+        winnerId: { type: string, nullable: true }
+        openedBy: { $ref: "#/components/schemas/User" }
+        players: { type: array, items: { $ref: "#/components/schemas/User" } }
+        questions: { type: array, items: { $ref: "#/components/schemas/Question" } }
+        winner: { $ref: "#/components/schemas/User" }
+
+    RoomDto:
+      type: object
+      required: [title, questionCount, chronoTiming]
+      properties:
+        title: { type: string }
+        questionTypeId: { type: string, nullable: true }
+        questionCount: { type: number }
+        chronoTiming: { type: number }
+
+    RoomPlayerScore:
+      type: object
+      properties:
+        roomId: { type: string }
+        userId: { type: string }
+        score: { type: number }
+        finished: { type: boolean }
+        user: { $ref: "#/components/schemas/User" }
+
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        username: { type: string, nullable: true }
+        email: { type: string }
+        emailVerified: { type: boolean }
+        image: { type: string, nullable: true }
+        displayUsername: { type: string, nullable: true }
+        role: { type: string, nullable: true }
+        banned: { type: boolean, nullable: true }
+        banReason: { type: string, nullable: true }
+        banExpires: { type: string, nullable: true }
+        rank: { type: number, nullable: true }
+        highestScore: { type: number }
+        createdAt: { type: string, format: date-time }
+
+    UserFull:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            accounts: { type: array, items: { $ref: "#/components/schemas/Account" } }
+            sessions: { type: array, items: { $ref: "#/components/schemas/Session" } }
+            openedRooms: { type: array, items: { $ref: "#/components/schemas/Room" } }
+            wonRooms: { type: array, items: { $ref: "#/components/schemas/Room" } }
+            joinedRooms: { type: array, items: { $ref: "#/components/schemas/Room" } }
+            notifications: { type: array, items: { $ref: "#/components/schemas/Notification" } }
+
+    Session:
+      type: object
+      properties:
+        id: { type: string }
+        expiresAt: { type: string, format: date-time }
+        token: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        ipAddress: { type: string, nullable: true }
+        userAgent: { type: string, nullable: true }
+        userId: { type: string }
+
+    Account:
+      type: object
+      properties:
+        id: { type: string }
+        accountId: { type: string }
+        providerId: { type: string }
+        userId: { type: string }
+        password: { type: string, nullable: true }
+        accessToken: { type: string, nullable: true }
+        refreshToken: { type: string, nullable: true }
+        idToken: { type: string, nullable: true }
+        accessTokenExpiresAt: { type: string, nullable: true }
+        refreshTokenExpiresAt: { type: string, nullable: true }
+        scope: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Notification:
+      type: object
+      properties:
+        id: { type: string }
+        seen: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        userId: { type: string }
+        header: { type: string }
+        body: { type: string }
+        isDeleted: { type: boolean }
+
+    # ── Admin Models ──────────────────────────────────────────────────────────
+    AdminUser:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        username: { type: string, nullable: true }
+        email: { type: string }
+        image: { type: string, nullable: true }
+        role: { type: string, nullable: true }
+        banned: { type: boolean, nullable: true }
+        banReason: { type: string, nullable: true }
+        banExpires: { type: string, nullable: true }
+        highestScore: { type: number }
+        rank: { type: number, nullable: true }
+        createdAt: { type: string, format: date-time }
+        _count:
+          type: object
+          properties:
+            notifications: { type: integer }
+            openedRooms: { type: integer }
+            joinedRooms: { type: integer }
+
+    AdminRoom:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        startDate: { type: string, format: date-time }
+        chronoTiming: { type: number }
+        openedBy:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            username: { type: string, nullable: true }
+            email: { type: string }
+            image: { type: string, nullable: true }
+        winner:
+          type: object
+          nullable: true
+          properties:
+            id: { type: string }
+            name: { type: string }
+        _count:
+          type: object
+          properties:
+            players: { type: integer }
+            questions: { type: integer }
+
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid session
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string, example: "Unauthorized" }
+    Forbidden:
+      description: Authenticated but insufficient permissions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string, example: "Forbidden" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string, example: "Not found" }
+    BadRequest:
+      description: Invalid request body or parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string, example: "Missing required fields" }
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string, example: "Internal Server Error" }
