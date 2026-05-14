@@ -91,6 +91,9 @@ export const Header = (props: HeaderPropsType) => {
                 <Button variant="ghost" onClick={() => router.push("/contact")}>
                     Contact
                 </Button>
+                <Button variant="ghost" onClick={() => router.push("/code/playground")}>
+                    Playground
+                </Button>
                 {props.logged ? (
                     <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)}>
                         Profile
@@ -140,6 +143,12 @@ export const Header = (props: HeaderPropsType) => {
                                 onClick={() => router.push("/contact")}
                             >
                                 Contact
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push("/code/playground")}
+                            >
+                                Playground
                             </Button>
                             {props.logged ? (
                                 <Button
