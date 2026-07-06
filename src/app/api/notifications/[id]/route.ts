@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, verifyNotificationOwnership } from "@/lib/auth-utils";
+import { validateBody, updateNotificationSchema } from "@/lib/validation";
 
 export const PATCH = async (
     req: NextRequest,
@@ -19,27 +20,15 @@ export const PATCH = async (
     const authCheck = await verifyNotificationOwnership(notificationId);
     if (authCheck) return authCheck;
 
-    const dataReceived = await req.json();
-
-        // TODO: Update in case you need to add other field later
-        const allowedFields = ["seen"];
-
-        const filteredData = Object.fromEntries(
-            Object.entries(dataReceived).filter(([key]) => allowedFields.includes(key)),
-        );
-
-        if (Object.keys(filteredData).length === 0) {
-            return NextResponse.json(
-                { message: "Invalid field" },
-                { status: 400 },
-            );
-        }
+    const body = await req.json();
+        const { parsed, error } = validateBody(updateNotificationSchema, body);
+        if (error) return error;
 
         await prisma.notification.update({
             where: {
                 id: notificationId,
             },
-            data: filteredData,
+            data: parsed,
         });
 
         return NextResponse.json(
