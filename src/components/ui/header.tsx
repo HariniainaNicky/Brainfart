@@ -85,6 +85,9 @@ export const Header = (props: HeaderPropsType) => {
                 >
                     Questions
                 </Button>
+                <Button variant="ghost" onClick={() => router.push("/ai")}>
+                    AI Interview
+                </Button>
                 <Button variant="ghost" onClick={() => router.push("/setting")}>
                     Settings
                 </Button>
@@ -128,6 +131,12 @@ export const Header = (props: HeaderPropsType) => {
                                 onClick={() => router.push("/questions")}
                             >
                                 Questions
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push("/ai")}
+                            >
+                                AI Interview
                             </Button>
                             <Button
                                 variant="ghost"
