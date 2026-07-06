@@ -72,21 +72,26 @@ export const InterviewLanding = () => {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="flex flex-col gap-6 justify-center items-center mt-16 md:mt-24 relative z-10"
             >
-                <div className="flex flex-row items-center gap-4 flex-wrap justify-center">
-                    <motion.h1
-                        className="cursor-pointer text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl select-none"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                    >
-                        BrainFart
-                    </motion.h1>
+                <motion.h1
+                    className="cursor-pointer text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl select-none"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
+                    BrainFart
+                </motion.h1>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.15, duration: 0.4 }}
+                >
                     <Badge
                         variant="default"
-                        className="text-lg sm:text-xl md:text-2xl px-4 py-2 mt-2 md:mt-4 lg:mt-6 rounded-full"
+                        className="px-3 py-1 rounded-full text-sm"
                     >
                         Interview
                     </Badge>
-                </div>
+                </motion.div>
 
                 <motion.p
                     initial={{ opacity: 0 }}
