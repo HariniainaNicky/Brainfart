@@ -22,7 +22,7 @@ export const PATCH = async (
         const { parsed, error } = validateBody(validateQuestionSchema, body);
         if (error) return error;
 
-        const updateData: { isValidated: boolean; Score?: number; typeId?: string } = {
+        const updateData: { isValidated: boolean; Score?: number; typeId?: string | null } = {
             isValidated: parsed.isValidated,
         };
 
@@ -42,7 +42,7 @@ export const PATCH = async (
         });
 
         return NextResponse.json(
-            { message: `Question ${isValidated ? "approved" : "rejected"} successfully` },
+            { message: `Question ${parsed.isValidated ? "approved" : "rejected"} successfully` },
             { status: 200 },
         );
     } catch (error) {
