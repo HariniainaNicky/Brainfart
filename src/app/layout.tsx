@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { BsBrightnessHigh } from "react-icons/bs";
@@ -44,6 +45,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                         }}
                     />
                 </ThemeProvider>
+                <Analytics />
             </body>
         </html>
     );
