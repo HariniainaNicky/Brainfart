@@ -5,7 +5,7 @@ const client = new OpenAI({
   apiKey: process.env.OPENCODE_API_KEY!,
 });
 
-const model = process.env.AI_MODEL ?? "deepseek-v4-flash";
+const model = process.env.AI_MODEL;
 
 const roleLabels: Record<string, string> = {
   backend: "Backend Developer",
