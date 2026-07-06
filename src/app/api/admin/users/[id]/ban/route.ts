@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { validateBody, banUserSchema } from "@/lib/validation";
 
 export const PATCH = async (
     req: NextRequest,
@@ -17,14 +18,11 @@ export const PATCH = async (
 
     try {
         const { id: userId } = await context.params;
-        const { banned, reason, expiresAt } = await req.json();
+        const body = await req.json();
+        const { parsed, error } = validateBody(banUserSchema, body);
+        if (error) return error;
 
-        if (typeof banned !== "boolean") {
-            return NextResponse.json(
-                { message: "banned must be a boolean" },
-                { status: 400 },
-            );
-        }
+        const { banned, reason, expiresAt } = parsed;
 
         // Prevent admin from banning themselves
         if (userId === session.user.id) {
