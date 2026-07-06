@@ -4,15 +4,16 @@ import { motion } from "motion/react";
 import { Button } from "../shadcn-component/button";
 import { Input } from "../shadcn-component/input";
 import { Badge } from "../shadcn-component/badge";
-import { ChevronLeft, Loader2, Plus, Sparkles, X } from "lucide-react";
+import { ChevronLeft, Loader2, Plus, Sparkles, X, Languages } from "lucide-react";
 
 interface Props {
   role: string;
-  onStart: (stack: string[]) => void;
+  onStart: (lang: string, stack: string[]) => void;
   onBack: () => void;
 }
 
 export const StackSelect = ({ role, onStart, onBack }: Props) => {
+  const [lang, setLang] = useState("English");
   const [suggested, setSuggested] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [customTag, setCustomTag] = useState("");
@@ -153,12 +154,37 @@ export const StackSelect = ({ role, onStart, onBack }: Props) => {
             </motion.div>
           )}
 
+          <div className="border-t pt-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Languages className="size-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Interview language:
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={lang === "English" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setLang("English")}
+              >
+                English
+              </Button>
+              <Button
+                variant={lang === "French" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setLang("French")}
+              >
+                Français
+              </Button>
+            </div>
+          </div>
+
           <div className="flex justify-center pt-4">
             <Button
               variant="default"
               size="lg"
               className="gap-2"
-              onClick={() => onStart(selected)}
+              onClick={() => onStart(lang, selected)}
             >
               <Sparkles className="size-5" />
               {selected.length === 0

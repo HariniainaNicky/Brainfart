@@ -18,7 +18,7 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    const { mode, role, messages, question, answer, stack } = await req.json();
+    const { mode, role, messages, question, answer, stack, lang } = await req.json();
 
     if (!role) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export const POST = async (req: NextRequest) => {
     const userId = session.user.id;
 
     if (mode === "suggest-stack") {
-      const items = await suggestStack(role);
+      const items = await suggestStack(role, lang ?? "English");
       return NextResponse.json({ stack: items });
     }
 
@@ -44,6 +44,7 @@ export const POST = async (req: NextRequest) => {
       const aiMessage = await startOrContinueInterview(
         role,
         progress,
+        lang ?? "English",
         [
           {
             role: "assistant" as const,
@@ -75,6 +76,7 @@ export const POST = async (req: NextRequest) => {
       const aiMessage = await startOrContinueInterview(
         role,
         progress,
+        lang ?? "English",
         messages,
         session.user.name ?? undefined,
         stack,
@@ -91,7 +93,7 @@ export const POST = async (req: NextRequest) => {
         );
       }
 
-      const evaluation = await evaluateAnswer(role, question, answer);
+      const evaluation = await evaluateAnswer(role, question, answer, lang ?? "English");
 
       await prisma.interviewProgress.update({
         where: { id: progress.id },
