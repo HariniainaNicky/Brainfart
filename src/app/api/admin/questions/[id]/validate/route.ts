@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { validateBody, validateQuestionSchema } from "@/lib/validation";
 
 export const PATCH = async (
     req: NextRequest,
@@ -17,25 +18,20 @@ export const PATCH = async (
 
     try {
         const { id: questionId } = await context.params;
-        const { isValidated, score, typeId } = await req.json();
-
-        if (typeof isValidated !== "boolean") {
-            return NextResponse.json(
-                { message: "isValidated must be a boolean" },
-                { status: 400 },
-            );
-        }
+        const body = await req.json();
+        const { parsed, error } = validateBody(validateQuestionSchema, body);
+        if (error) return error;
 
         const updateData: { isValidated: boolean; Score?: number; typeId?: string } = {
-            isValidated,
+            isValidated: parsed.isValidated,
         };
 
-        if (score !== undefined && typeof score === "number") {
-            updateData.Score = score;
+        if (parsed.score !== undefined) {
+            updateData.Score = parsed.score;
         }
 
-        if (typeId !== undefined) {
-            updateData.typeId = typeId || null;
+        if (parsed.typeId !== undefined) {
+            updateData.typeId = parsed.typeId || null;
         }
 
         await prisma.question.update({
