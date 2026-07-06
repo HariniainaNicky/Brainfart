@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyOwnership } from "@/lib/auth-utils";
+import { validateBody, updateScoreSchema } from "@/lib/validation";
 
 export const GET = async (
   _req: NextRequest,
@@ -73,7 +74,9 @@ export const PATCH = async (  req: NextRequest, context: RouteContext<"/api/user
     const authCheck = await verifyOwnership(userId);
     if (authCheck) return authCheck;
 
-    const { score } = await req.json();
+    const body = await req.json();
+    const { parsed, error } = validateBody(updateScoreSchema, body);
+    if (error) return error;
 
     const user = await prisma.user.findUnique({
       where: {
@@ -85,18 +88,20 @@ export const PATCH = async (  req: NextRequest, context: RouteContext<"/api/user
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const updatedUser = await prisma.user.update({
+    const highestScore = Math.max(user.highestScore ?? 0, parsed.score);
+
+    await prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        highestScore: user.highestScore + score,
+        highestScore,
       },
     });
 
     return NextResponse.json(
       {
-        data: updatedUser,
+        message: "Score updated",
       },
       { status: 200 },
     );

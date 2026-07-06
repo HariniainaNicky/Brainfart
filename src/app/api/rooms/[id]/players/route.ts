@@ -3,6 +3,7 @@ import { insertUserInRoom } from "@/services/room";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRoomOwnership } from "@/lib/auth-utils";
+import { validateBody, addPlayerSchema } from "@/lib/validation";
 
 export const PUT = async (
   req: NextRequest,
@@ -16,10 +17,12 @@ export const PUT = async (
   }
 
   try {
-    const data = await req.json();
+    const body = await req.json();
+    const { parsed, error } = validateBody(addPlayerSchema, body);
+    if (error) return error;
     const params = await context.params;
     const roomId: string = params.id;
-    const targetUserId: string = data.userId;
+    const targetUserId: string = parsed.userId;
 
     const authCheck = await verifyRoomOwnership(roomId);
     if (authCheck && session.user.id !== targetUserId) {

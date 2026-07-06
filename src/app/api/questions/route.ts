@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { validateBody, createQuestionSchema } from "@/lib/validation";
 
 export const GET = async (req: NextRequest) => {
     try {
@@ -110,12 +111,11 @@ export const POST = async (req: NextRequest) => {
     }
 
     try {
-        const data = await req.json();
-        const question = data.question;
-        const score = data.score;
-        const isValidated = data.isValidated;
-        const answer = data.answer;
-        const userId = data.userId;
+        const body = await req.json();
+        const { parsed, error } = validateBody(createQuestionSchema, body);
+        if (error) return error;
+
+        const { question, score, isValidated, answer, userId } = parsed;
 
         await prisma.question.create(
             {

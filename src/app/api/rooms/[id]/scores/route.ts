@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { getRoomScores, upsertScore } from "@/services/score";
+import { validateBody, upsertScoreSchema } from "@/lib/validation";
 
 export const GET = async (
   _req: NextRequest,
@@ -35,13 +36,15 @@ export const PATCH = async (
 
   try {
     const { id: roomId } = await context.params;
-    const { userId, score, finished } = await req.json();
+    const body = await req.json();
+    const { parsed, error } = validateBody(upsertScoreSchema, body);
+    if (error) return error;
 
-    if (session.user.id !== userId) {
+    if (session.user.id !== parsed.userId) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
-    await upsertScore(roomId, userId, score, finished);
+    await upsertScore(roomId, parsed.userId, parsed.score, parsed.finished);
     return NextResponse.json({ message: "Score updated" }, { status: 200 });
   } catch (error) {
     return NextResponse.json(

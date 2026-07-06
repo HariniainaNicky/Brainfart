@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { validateBody, updateRoleSchema } from "@/lib/validation";
 
 export const PATCH = async (
     req: NextRequest,
@@ -17,14 +18,11 @@ export const PATCH = async (
 
     try {
         const { id: userId } = await context.params;
-        const { role } = await req.json();
+        const body = await req.json();
+        const { parsed, error } = validateBody(updateRoleSchema, body);
+        if (error) return error;
 
-        if (!role || !["user", "admin"].includes(role)) {
-            return NextResponse.json(
-                { message: "Role must be either 'user' or 'admin'" },
-                { status: 400 },
-            );
-        }
+        const { role } = parsed;
 
         // Prevent admin from demoting themselves
         if (userId === session.user.id) {

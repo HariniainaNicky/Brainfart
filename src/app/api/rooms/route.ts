@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { createRoom } from "@/services/room";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { validateBody, createRoomSchema } from "@/lib/validation";
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -36,9 +37,11 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   try {
-    const data = await req.json();
+    const body = await req.json();
+    const { parsed, error } = validateBody(createRoomSchema, body);
+    if (error) return error;
     const userId = session.user.id;
-    await createRoom(data, userId);
+    await createRoom(parsed, userId);
     return NextResponse.json({ message: "Room created successfully" }, { status: 200 });
   } catch (error) {
     console.error(error);

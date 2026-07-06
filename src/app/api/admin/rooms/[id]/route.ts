@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 } from "uuid";
+import { validateBody, deleteRoomSchema } from "@/lib/validation";
 
 export const DELETE = async (
     req: NextRequest,
@@ -18,14 +19,11 @@ export const DELETE = async (
 
     try {
         const { id } = await params;
-        const { reason } = await req.json();
+        const body = await req.json();
+        const { parsed, error } = validateBody(deleteRoomSchema, body);
+        if (error) return error;
 
-        if (!reason) {
-            return NextResponse.json(
-                { message: "Deletion reason is required" },
-                { status: 400 },
-            );
-        }
+        const { reason } = parsed;
 
         const room = await prisma.room.findUnique({
             where: { id },

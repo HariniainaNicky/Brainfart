@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 } from "uuid";
+import { validateBody, createNotificationSchema } from "@/lib/validation";
 
 export const POST = async (req: NextRequest) => {
     const session = await auth.api.getSession({
@@ -14,14 +15,11 @@ export const POST = async (req: NextRequest) => {
     }
 
     try {
-        const { userId, header, body } = await req.json();
+        const bodyData = await req.json();
+        const { parsed, error } = validateBody(createNotificationSchema, bodyData);
+        if (error) return error;
 
-        if (!userId || !header || !body) {
-            return NextResponse.json(
-                { message: "Missing required fields" },
-                { status: 400 },
-            );
-        }
+        const { userId, header, body } = parsed;
 
         const notification = await prisma.notification.create({
             data: {
