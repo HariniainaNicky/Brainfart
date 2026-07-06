@@ -3,11 +3,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { v4 } from "uuid";
+import { PROMPTS } from "@/lib/prompts";
 import {
   startOrContinueInterview,
   evaluateAnswer,
   suggestStack,
-  buildInterviewPrompt,
 } from "@/lib/ai";
 
 export const POST = async (req: NextRequest) => {
@@ -47,8 +47,7 @@ export const POST = async (req: NextRequest) => {
         [
           {
             role: "assistant" as const,
-            content:
-              "Introduce yourself as an HR interviewer and ask the first technical question for this position.",
+            content: PROMPTS.startMessage,
           },
         ],
         session.user.name ?? undefined,

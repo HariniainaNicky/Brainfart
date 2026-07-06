@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { getRoleLabel } from "@/lib/ai-utils";
+import { PROMPTS } from "@/lib/prompts";
 
 const client = new OpenAI({
   baseURL: "https://opencode.ai/zen/v1",
@@ -7,12 +8,21 @@ const client = new OpenAI({
 });
 
 const model = process.env.AI_MODEL!;
+
 function getMasteryDetails(score: number) {
   if (score >= 1000) return { level: "Expert", label: "Ready for Staff/Principal" };
   if (score >= 600) return { level: "Senior Ready", label: "Ready for senior interviews" };
   if (score >= 300) return { level: "Mid Ready", label: "Ready for mid-level interviews" };
   if (score >= 100) return { level: "Junior Ready", label: "Ready for junior interviews" };
   return { level: "Beginner", label: "Learning the basics" };
+}
+
+function fill(template: string, vars: Record<string, string>): string {
+  let result = template;
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replaceAll(`{{${key}}}`, value);
+  }
+  return result;
 }
 
 export function buildInterviewPrompt(
@@ -26,32 +36,21 @@ export function buildInterviewPrompt(
   const pct = mastery.answered > 0
     ? Math.round((mastery.correct / mastery.answered) * 100)
     : 0;
+  const stackLine = stack && stack.length > 0
+    ? `- Tech stack: ${stack.join(", ")}`
+    : "";
 
-  return `You are a senior HR technical interviewer at a top tech company. You are interviewing a candidate for a ${roleLabel} position.
-
-Candidate profile:
-- Name: ${userName ?? "Anonymous"}
-- Current mastery level: ${level} (score: ${mastery.score})
-- Questions answered: ${mastery.answered}
-- Correct answers: ${mastery.correct}
-- Accuracy rate: ${pct}%
-${stack && stack.length > 0 ? `- Tech stack: ${stack.join(", ")}` : ""}
-- Overall readiness: ${label}
-
-Instructions:
-1. Ask ONE technical question at a time. Start at the ${level} difficulty level.
-2. After each answer, evaluate it and give concise constructive feedback.
-3. If they answer correctly, ask a follow-up or move to a harder topic.
-4. If they struggle, ask clarifying questions or simplify.
-5. Stay in character as an HR interviewer — be professional, encouraging, but challenging.
-6. Adapt the difficulty based on their performance during this session.
-7. Keep questions focused on practical knowledge and real-world scenarios.
-8. After the candidate answers, provide:
-   - A brief evaluation (what was good, what could be improved)
-   - Whether the answer is considered correct/partially correct/incorrect
-   - A score out of 10
-   - Then ask the next question
-9. When the candidate types "done", "finish", or "end interview", provide a final summary of their performance with strengths, weaknesses, and recommendations.`;
+  return fill(PROMPTS.interviewSystem, {
+    roleLabel,
+    userName: userName ?? "Anonymous",
+    level,
+    score: String(mastery.score),
+    answered: String(mastery.answered),
+    correct: String(mastery.correct),
+    pct: String(pct),
+    stackLine,
+    label,
+  });
 }
 
 export async function suggestStack(role: string): Promise<string[]> {
@@ -60,9 +59,7 @@ export async function suggestStack(role: string): Promise<string[]> {
     messages: [
       {
         role: "system",
-        content: `You are a technical recruiter. Suggest 10-15 common technologies, frameworks, tools, and skills for a "${role}" position.
-Return ONLY a valid JSON array of strings, each being a specific technology or skill (e.g. "React", "Node.js", "PostgreSQL").
-Keep items concise and specific. Do not include the role itself or generic terms like "Teamwork".`,
+        content: fill(PROMPTS.suggestStack, { role }),
       },
     ],
     response_format: { type: "json_object" },
@@ -108,18 +105,11 @@ export async function evaluateAnswer(
     messages: [
       {
         role: "system",
-        content: `You are an impartial evaluator for a ${roleLabel} interview.
-Evaluate the candidate's answer to the question below.
-Return ONLY a valid JSON object with no markdown formatting:
-{
-  "isCorrect": boolean,
-  "score": number (0-10),
-  "feedback": "brief feedback string"
-}`,
+        content: fill(PROMPTS.evaluateSystem, { roleLabel }),
       },
       {
         role: "user",
-        content: `Question: "${question}"\n\nCandidate's answer: "${userAnswer}"`,
+        content: fill(PROMPTS.evaluateUser, { question, answer: userAnswer }),
       },
     ],
     response_format: { type: "json_object" },
