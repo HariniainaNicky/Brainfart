@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserProfile } from "@/services/user";
 import { verifyOwnership } from "@/lib/auth-utils";
+import { validateBody, updateImageSchema } from "@/lib/validation";
 
 export const PATCH = async (req: NextRequest, context: RouteContext<"/api/users/[id]/image">) => {
 
@@ -18,9 +19,10 @@ export const PATCH = async (req: NextRequest, context: RouteContext<"/api/users/
     const { id: userId } = await context.params;
     const authCheck = await verifyOwnership(userId);
     if (authCheck) return authCheck;
-    const dataReceived = await req.json();
-    const image = dataReceived.image;
-    await updateUserProfile(userId, image);
+    const body = await req.json();
+    const { parsed, error } = validateBody(updateImageSchema, body);
+    if (error) return error;
+    await updateUserProfile(userId, parsed.image);
 
     return NextResponse.json(
       {
