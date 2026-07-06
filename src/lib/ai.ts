@@ -19,6 +19,7 @@ export function buildInterviewPrompt(
   role: string,
   mastery: { score: number; answered: number; correct: number },
   userName?: string,
+  stack?: string[],
 ) {
   const roleLabel = getRoleLabel(role);
   const { level, label } = getMasteryDetails(mastery.score);
@@ -34,6 +35,7 @@ Candidate profile:
 - Questions answered: ${mastery.answered}
 - Correct answers: ${mastery.correct}
 - Accuracy rate: ${pct}%
+${stack && stack.length > 0 ? `- Tech stack: ${stack.join(", ")}` : ""}
 - Overall readiness: ${label}
 
 Instructions:
@@ -52,13 +54,36 @@ Instructions:
 9. When the candidate types "done", "finish", or "end interview", provide a final summary of their performance with strengths, weaknesses, and recommendations.`;
 }
 
+export async function suggestStack(role: string): Promise<string[]> {
+  const res = await client.chat.completions.create({
+    model,
+    messages: [
+      {
+        role: "system",
+        content: `You are a technical recruiter. Suggest 10-15 common technologies, frameworks, tools, and skills for a "${role}" position.
+Return ONLY a valid JSON array of strings, each being a specific technology or skill (e.g. "React", "Node.js", "PostgreSQL").
+Keep items concise and specific. Do not include the role itself or generic terms like "Teamwork".`,
+      },
+    ],
+    response_format: { type: "json_object" },
+  });
+
+  try {
+    const parsed = JSON.parse(res.choices[0].message.content!);
+    return Array.isArray(parsed) ? parsed : parsed.stack ?? parsed.skills ?? parsed.technologies ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export async function startOrContinueInterview(
   role: string,
   mastery: { score: number; answered: number; correct: number },
   history: { role: "assistant" | "user"; content: string }[],
   userName?: string,
+  stack?: string[],
 ) {
-  const systemPrompt = buildInterviewPrompt(role, mastery, userName);
+  const systemPrompt = buildInterviewPrompt(role, mastery, userName, stack);
 
   const res = await client.chat.completions.create({
     model,

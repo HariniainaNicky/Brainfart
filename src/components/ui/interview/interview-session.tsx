@@ -24,10 +24,11 @@ type Mastery = {
 
 interface Props {
   role: string;
+  stack: string[];
   onBack: () => void;
 }
 
-export const InterviewSession = ({ role, onBack }: Props) => {
+export const InterviewSession = ({ role, stack, onBack }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -55,7 +56,7 @@ export const InterviewSession = ({ role, onBack }: Props) => {
         const res = await fetch("/api/ai/interview", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "start", role }),
+          body: JSON.stringify({ mode: "start", role, stack }),
         });
 
         if (!res.ok) {
@@ -99,6 +100,7 @@ export const InterviewSession = ({ role, onBack }: Props) => {
           body: JSON.stringify({
             mode: "evaluate",
             role,
+            stack,
             question: questionMessage.content,
             answer,
           }),
@@ -114,7 +116,7 @@ export const InterviewSession = ({ role, onBack }: Props) => {
       const chatRes = await fetch("/api/ai/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "chat", role, messages: updatedMessages }),
+        body: JSON.stringify({ mode: "chat", role, stack, messages: updatedMessages }),
       });
 
       if (!chatRes.ok) {

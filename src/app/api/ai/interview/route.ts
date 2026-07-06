@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 import {
   startOrContinueInterview,
   evaluateAnswer,
+  suggestStack,
   buildInterviewPrompt,
 } from "@/lib/ai";
 
@@ -17,7 +18,7 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    const { mode, role, messages, question, answer } = await req.json();
+    const { mode, role, messages, question, answer, stack } = await req.json();
 
     if (!role) {
       return NextResponse.json(
@@ -27,6 +28,11 @@ export const POST = async (req: NextRequest) => {
     }
 
     const userId = session.user.id;
+
+    if (mode === "suggest-stack") {
+      const items = await suggestStack(role);
+      return NextResponse.json({ stack: items });
+    }
 
     const progress = await prisma.interviewProgress.upsert({
       where: { userId_role: { userId, role } },
@@ -46,6 +52,7 @@ export const POST = async (req: NextRequest) => {
           },
         ],
         session.user.name ?? undefined,
+        stack,
       );
 
       return NextResponse.json({
@@ -71,9 +78,10 @@ export const POST = async (req: NextRequest) => {
         progress,
         messages,
         session.user.name ?? undefined,
+        stack,
       );
 
-      return NextResponse.json({ message: aiMessage });
+      return NextResponse.json({ message: aiMessage, mastery: progress });
     }
 
     if (mode === "evaluate") {

@@ -1,5 +1,7 @@
 "use client";
 import { InterviewLanding } from "@/components/ui/interview/interview-landing";
+import { RoleSelect } from "@/components/ui/interview/role-select";
+import { StackSelect } from "@/components/ui/interview/stack-select";
 import { InterviewSession } from "@/components/ui/interview/interview-session";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
@@ -8,9 +10,13 @@ import { useUser } from "@/stores/useUser";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/shadcn-component/skeleton";
 
+type Step = "landing" | "role-select" | "stack-select" | "session";
+
 const Page = () => {
   const [logged, setLogged] = useState<boolean>(false);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>("landing");
+  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedStack, setSelectedStack] = useState<string[]>([]);
   const { data: session, isPending } = authClient.useSession();
   const { setUserData } = useUser();
 
@@ -22,6 +28,16 @@ const Page = () => {
       setUserData(session?.user);
     }
   }, [session, setUserData]);
+
+  const handleSelectRole = (role: string) => {
+    setSelectedRole(role);
+    setStep("stack-select");
+  };
+
+  const handleStartSession = (stack: string[]) => {
+    setSelectedStack(stack);
+    setStep("session");
+  };
 
   if (isPending) {
     return (
@@ -39,13 +55,26 @@ const Page = () => {
   return (
     <div className="flex flex-col m-2 gap-3">
       <Header logged={logged} session={session} />
-      {selectedRole ? (
+      {step === "landing" && <InterviewLanding onStart={() => setStep("role-select")} />}
+      {step === "role-select" && (
+        <RoleSelect
+          onSelectRole={handleSelectRole}
+          onBack={() => setStep("landing")}
+        />
+      )}
+      {step === "stack-select" && (
+        <StackSelect
+          role={selectedRole}
+          onStart={handleStartSession}
+          onBack={() => setStep("role-select")}
+        />
+      )}
+      {step === "session" && (
         <InterviewSession
           role={selectedRole}
-          onBack={() => setSelectedRole(null)}
+          stack={selectedStack}
+          onBack={() => setStep("stack-select")}
         />
-      ) : (
-        <InterviewLanding onSelectRole={setSelectedRole} />
       )}
       <Footer />
     </div>
