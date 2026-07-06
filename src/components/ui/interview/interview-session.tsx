@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "../shadcn-component/button";
 import { Textarea } from "../shadcn-component/textarea";
 import { getRoleLabel } from "@/lib/ai-utils";
-import { Send, Loader2, ChevronLeft, Trophy } from "lucide-react";
+import { Send, Square, ChevronLeft, Trophy } from "lucide-react";
 
 type Message = {
   role: "assistant" | "user";
@@ -16,6 +16,7 @@ type Evaluation = {
   isCorrect: boolean;
   score: number;
   feedback: string;
+  mastery?: Mastery;
 };
 
 type Mastery = {
@@ -29,6 +30,26 @@ interface Props {
   stack: string[];
   lang: string;
   onBack: () => void;
+}
+
+function ThinkingDots() {
+  return (
+    <div className="flex items-center gap-1.5 px-1">
+      <span
+        className="size-2 rounded-full bg-muted-foreground/60 animate-bounce"
+        style={{ animationDelay: "0ms" }}
+      />
+      <span
+        className="size-2 rounded-full bg-muted-foreground/60 animate-bounce"
+        style={{ animationDelay: "150ms" }}
+      />
+      <span
+        className="size-2 rounded-full bg-muted-foreground/60 animate-bounce"
+        style={{ animationDelay: "300ms" }}
+      />
+      <span className="text-xs text-muted-foreground ml-1.5">Thinking</span>
+    </div>
+  );
 }
 
 function MarkdownContent({ content }: { content: string }) {
@@ -72,6 +93,7 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [mastery, setMastery] = useState<Mastery>({
     score: 0,
     answered: 0,
@@ -80,12 +102,15 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [lastEvaluation, setLastEvaluation] = useState<Evaluation | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    const el = scrollRef.current;
+    if (!el) return;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+    if (isNearBottom) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -106,7 +131,12 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
 
         const data = await res.json();
         setMastery(data.mastery);
-        setMessages([{ role: "assistant", content: data.message }]);
+
+        if (data.messages) {
+          setMessages(data.messages);
+        } else if (data.message) {
+          setMessages([{ role: "assistant", content: data.message }]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to start");
       } finally {
@@ -117,11 +147,17 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
     startInterview();
   }, [role, stack, lang]);
 
+  const handleStop = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     const answer = input.trim();
     if (!answer || isProcessing) return;
 
     setIsProcessing(true);
+    setIsStreaming(false);
     setError(null);
     setLastEvaluation(null);
 
@@ -150,28 +186,63 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
         if (evalRes.ok) {
           const evaluation: Evaluation = await evalRes.json();
           setLastEvaluation(evaluation);
+          if (evaluation.mastery) setMastery(evaluation.mastery);
         }
       }
 
-      const updatedMessages = [...messages, { role: "user" as const, content: answer }];
+      const updatedMessages = [
+        ...messages,
+        { role: "user" as const, content: answer },
+      ];
+
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+      const abortController = new AbortController();
+      abortRef.current = abortController;
+      setIsStreaming(true);
+
       const chatRes = await fetch("/api/ai/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "chat", role, stack, lang, messages: updatedMessages }),
+        body: JSON.stringify({
+          mode: "chat",
+          role,
+          stack,
+          lang,
+          messages: updatedMessages,
+        }),
+        signal: abortController.signal,
       });
 
       if (!chatRes.ok) {
-        const data = await chatRes.json();
-        throw new Error(data.message ?? "Failed to get response");
+        const text = await chatRes.text();
+        throw new Error(text || "Failed to get response");
       }
 
-      const data = await chatRes.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
-      setMastery(data.mastery ?? mastery);
+      const reader = chatRes.body!.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        fullContent += decoder.decode(value, { stream: true });
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            role: "assistant",
+            content: fullContent,
+          };
+          return next;
+        });
+      }
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
+      setIsStreaming(false);
       setIsProcessing(false);
+      abortRef.current = null;
     }
   }, [input, isProcessing, messages, role, mastery, stack, lang]);
 
@@ -225,7 +296,7 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed max-h-[60vh] overflow-y-auto ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground rounded-br-md"
                   : "bg-muted rounded-bl-md prose prose-sm dark:prose-invert max-w-none"
@@ -233,8 +304,10 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
             >
               {msg.role === "user" ? (
                 msg.content
-              ) : (
+              ) : msg.content ? (
                 <MarkdownContent content={msg.content} />
+              ) : (
+                <ThinkingDots />
               )}
             </div>
           </div>
@@ -256,14 +329,6 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
               <p className="text-muted-foreground text-xs">
                 {lastEvaluation.feedback}
               </p>
-            </div>
-          </div>
-        )}
-
-        {isProcessing && (
-          <div className="flex justify-start">
-            <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
           </div>
         )}
@@ -298,14 +363,25 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
               }
             }}
           />
-          <Button
-            size="icon"
-            disabled={isProcessing || isFinished || !input.trim()}
-            onClick={handleSubmit}
-            className="self-end"
-          >
-            <Send className="size-4" />
-          </Button>
+          {isStreaming ? (
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={handleStop}
+              className="self-end"
+            >
+              <Square className="size-4" />
+            </Button>
+          ) : (
+            <Button
+              size="icon"
+              disabled={isProcessing || isFinished || !input.trim()}
+              onClick={handleSubmit}
+              className="self-end"
+            >
+              <Send className="size-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

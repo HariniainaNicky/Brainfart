@@ -41,6 +41,13 @@ const Page = () => {
     setStep("session");
   };
 
+  const handleResume = (role: string, stack: string[], lang: string) => {
+    setSelectedRole(role);
+    setSelectedStack(stack);
+    setSelectedLang(lang);
+    setStep("session");
+  };
+
   if (isPending) {
     return (
       <div className="flex flex-col m-2 gap-3">
@@ -59,7 +66,12 @@ const Page = () => {
   return (
     <div className={isSession ? "flex flex-col" : "flex flex-col m-2 gap-3"}>
       {!isSession && <Header logged={logged} session={session} />}
-      {step === "landing" && <InterviewLanding onStart={() => setStep("role-select")} />}
+      {step === "landing" && (
+        <InterviewLanding
+          onStart={() => setStep("role-select")}
+          onResume={handleResume}
+        />
+      )}
       {step === "role-select" && (
         <RoleSelect
           onSelectRole={handleSelectRole}
@@ -78,7 +90,7 @@ const Page = () => {
           role={selectedRole}
           stack={selectedStack}
           lang={selectedLang}
-          onBack={() => setStep("stack-select")}
+          onBack={() => setStep("landing")}
         />
       )}
       {!isSession && <Footer />}

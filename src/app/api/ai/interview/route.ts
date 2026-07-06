@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 import { PROMPTS } from "@/lib/prompts";
 import {
   startOrContinueInterview,
+  startOrContinueInterviewStream,
   evaluateAnswer,
   suggestStack,
 } from "@/lib/ai";
@@ -36,11 +37,36 @@ export const POST = async (req: NextRequest) => {
 
     const progress = await prisma.interviewProgress.upsert({
       where: { userId_role: { userId, role } },
-      update: {},
-      create: { id: v4(), userId, role },
+      update: { stack: stack ?? [], lang: lang ?? "English" },
+      create: {
+        id: v4(),
+        userId,
+        role,
+        stack: stack ?? [],
+        lang: lang ?? "English",
+      },
     });
 
     if (mode === "start") {
+      const existingMessages = await prisma.interviewMessage.findMany({
+        where: { progressId: progress.id },
+        orderBy: { createdAt: "asc" },
+      });
+
+      if (existingMessages.length > 0) {
+        return NextResponse.json({
+          mastery: {
+            score: progress.score,
+            answered: progress.answered,
+            correct: progress.correct,
+          },
+          messages: existingMessages.map((m) => ({
+            role: m.role as "assistant" | "user",
+            content: m.content,
+          })),
+        });
+      }
+
       const aiMessage = await startOrContinueInterview(
         role,
         progress,
@@ -73,7 +99,19 @@ export const POST = async (req: NextRequest) => {
         );
       }
 
-      const aiMessage = await startOrContinueInterview(
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.role === "user") {
+        await prisma.interviewMessage.create({
+          data: {
+            id: v4(),
+            progressId: progress.id,
+            role: "user",
+            content: lastMsg.content,
+          },
+        });
+      }
+
+      const stream = startOrContinueInterviewStream(
         role,
         progress,
         lang ?? "English",
@@ -82,7 +120,35 @@ export const POST = async (req: NextRequest) => {
         stack,
       );
 
-      return NextResponse.json({ message: aiMessage, mastery: progress });
+      const encoder = new TextEncoder();
+
+      const readable = new ReadableStream({
+        async start(controller) {
+          let fullContent = "";
+          try {
+            for await (const token of stream) {
+              fullContent += token;
+              controller.enqueue(encoder.encode(token));
+            }
+            await prisma.interviewMessage.create({
+              data: {
+                id: v4(),
+                progressId: progress.id,
+                role: "assistant",
+                content: fullContent,
+              },
+            });
+          } catch {
+            // Stream aborted or errored — don't save partial response
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(readable, {
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
     }
 
     if (mode === "evaluate") {
@@ -104,7 +170,18 @@ export const POST = async (req: NextRequest) => {
         },
       });
 
-      return NextResponse.json(evaluation);
+      const updatedProgress = await prisma.interviewProgress.findUnique({
+        where: { id: progress.id },
+      });
+
+      return NextResponse.json({
+        ...evaluation,
+        mastery: {
+          score: updatedProgress!.score,
+          answered: updatedProgress!.answered,
+          correct: updatedProgress!.correct,
+        },
+      });
     }
 
     return NextResponse.json({ message: "Invalid mode" }, { status: 400 });

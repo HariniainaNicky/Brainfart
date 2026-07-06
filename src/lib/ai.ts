@@ -53,7 +53,7 @@ export function buildInterviewPrompt(
     label,
   });
 
-  return `${prompt}\n\nIMPORTANT: Conduct the entire interview in ${lang}. All questions, feedback, and summaries must be in ${lang}.`;
+  return `${prompt}\n\nIMPORTANT: Conduct the entire interview in ${lang}. All questions, feedback, and summaries must be in ${lang}.\n\nCRITICAL FORMAT RULE: Never use bracketed placeholders like [Your Name], [Company Name], [Nom de l'entreprise], etc. Always invent specific, realistic names for yourself (interviewer) and the company. Be concrete, not generic.`;
 }
 
 export async function suggestStack(role: string, lang: string): Promise<string[]> {
@@ -95,6 +95,31 @@ export async function startOrContinueInterview(
   });
 
   return res.choices[0].message.content ?? "";
+}
+
+export async function* startOrContinueInterviewStream(
+  role: string,
+  mastery: { score: number; answered: number; correct: number },
+  lang: string,
+  history: { role: "assistant" | "user"; content: string }[],
+  userName?: string,
+  stack?: string[],
+): AsyncGenerator<string> {
+  const systemPrompt = buildInterviewPrompt(role, mastery, lang, userName, stack);
+
+  const stream = await client.chat.completions.create({
+    model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...history,
+    ],
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    const text = chunk.choices[0]?.delta?.content || "";
+    if (text) yield text;
+  }
 }
 
 export async function evaluateAnswer(
