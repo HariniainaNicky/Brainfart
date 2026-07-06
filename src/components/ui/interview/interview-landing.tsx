@@ -1,7 +1,6 @@
 "use client";
 import { motion } from "motion/react";
 import { Button } from "../shadcn-component/button";
-import { Badge } from "../shadcn-component/badge";
 import { Separator } from "../shadcn-component/separator";
 import { useRouter } from "next/navigation";
 import {
@@ -77,21 +76,8 @@ export const InterviewLanding = () => {
                     whileHover={{ scale: 1.1 }}
                     transition={{ type: "spring", stiffness: 300, damping: 10 }}
                 >
-                    BrainFart
+                    Brainfart AI
                 </motion.h1>
-
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.15, duration: 0.4 }}
-                >
-                    <Badge
-                        variant="default"
-                        className="px-3 py-1 rounded-full text-sm"
-                    >
-                        Interview
-                    </Badge>
-                </motion.div>
 
                 <motion.p
                     initial={{ opacity: 0 }}
