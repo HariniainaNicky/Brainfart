@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "../shadcn-component/button";
 import { Textarea } from "../shadcn-component/textarea";
 import { getRoleLabel } from "@/lib/ai-utils";
@@ -25,10 +27,48 @@ type Mastery = {
 interface Props {
   role: string;
   stack: string[];
+  lang: string;
   onBack: () => void;
 }
 
-export const InterviewSession = ({ role, stack, onBack }: Props) => {
+function MarkdownContent({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        code({ className, children, ...props }) {
+          const isInline = !className;
+          if (isInline) {
+            return (
+              <code className="bg-muted/80 px-1.5 py-0.5 rounded text-sm font-mono">
+                {children}
+              </code>
+            );
+          }
+          return (
+            <pre className="bg-muted/80 p-3 rounded-lg overflow-x-auto text-sm my-2 border">
+              <code className={className}>{children}</code>
+            </pre>
+          );
+        },
+        strong: ({ children }) => (
+          <strong className="font-semibold">{children}</strong>
+        ),
+        ul: ({ children }) => (
+          <ul className="list-disc pl-5 my-1 space-y-0.5">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="list-decimal pl-5 my-1 space-y-0.5">{children}</ol>
+        ),
+        p: ({ children }) => <p className="my-1 last:mb-0">{children}</p>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
+
+export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -56,7 +96,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
         const res = await fetch("/api/ai/interview", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "start", role, stack }),
+          body: JSON.stringify({ mode: "start", role, stack, lang }),
         });
 
         if (!res.ok) {
@@ -75,7 +115,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
     };
 
     startInterview();
-  }, [role]);
+  }, [role, stack, lang]);
 
   const handleSubmit = useCallback(async () => {
     const answer = input.trim();
@@ -101,6 +141,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
             mode: "evaluate",
             role,
             stack,
+            lang,
             question: questionMessage.content,
             answer,
           }),
@@ -116,7 +157,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
       const chatRes = await fetch("/api/ai/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "chat", role, stack, messages: updatedMessages }),
+        body: JSON.stringify({ mode: "chat", role, stack, lang, messages: updatedMessages }),
       });
 
       if (!chatRes.ok) {
@@ -132,7 +173,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
     } finally {
       setIsProcessing(false);
     }
-  }, [input, isProcessing, messages, role, mastery]);
+  }, [input, isProcessing, messages, role, mastery, stack, lang]);
 
   const isFinished = messages.some(
     (m) =>
@@ -142,14 +183,14 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
   );
 
   return (
-    <div className="flex flex-col w-full max-w-3xl mx-auto h-[calc(100dvh-10rem)]">
-      <div className="flex items-center gap-3 p-4 border-b">
+    <div className="flex flex-col w-full min-h-dvh max-w-3xl mx-auto">
+      <div className="flex items-center gap-3 p-4 border-b shrink-0">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ChevronLeft className="size-5" />
         </Button>
-        <div className="flex-1">
-          <h2 className="font-semibold text-lg">{getRoleLabel(role)}</h2>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="flex-1 min-w-0">
+          <h2 className="font-semibold text-lg truncate">{getRoleLabel(role)}</h2>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span>Score: {mastery.score}</span>
             <span>Answered: {mastery.answered}</span>
             <span>
@@ -158,7 +199,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
                 ? `${Math.round((mastery.correct / mastery.answered) * 100)}%`
                 : "N/A"}
             </span>
-            <Trophy className="size-3" />
+            <Trophy className="size-3 shrink-0" />
             <span>
               {mastery.score >= 1000
                 ? "Expert"
@@ -169,6 +210,9 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
                     : mastery.score >= 100
                       ? "Junior"
                       : "Beginner"}
+            </span>
+            <span className="text-xs uppercase text-muted-foreground/60">
+              {lang}
             </span>
           </div>
         </div>
@@ -181,13 +225,17 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-muted rounded-bl-md"
+                  : "bg-muted rounded-bl-md prose prose-sm dark:prose-invert max-w-none"
               }`}
             >
-              {msg.content}
+              {msg.role === "user" ? (
+                msg.content
+              ) : (
+                <MarkdownContent content={msg.content} />
+              )}
             </div>
           </div>
         ))}
@@ -199,7 +247,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
                 <span
                   className={`font-semibold ${lastEvaluation.isCorrect ? "text-green-500" : "text-red-500"}`}
                 >
-                  {lastEvaluation.isCorrect ? "Correct" : "Incorrect"}
+                  {lastEvaluation.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                 </span>
                 <span className="text-muted-foreground">
                   Score: {lastEvaluation.score}/10
@@ -229,7 +277,7 @@ export const InterviewSession = ({ role, stack, onBack }: Props) => {
         )}
       </div>
 
-      <div className="border-t p-4">
+      <div className="border-t p-4 shrink-0">
         <div className="flex gap-2">
           <Textarea
             value={input}

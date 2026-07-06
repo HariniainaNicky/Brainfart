@@ -28,6 +28,7 @@ function fill(template: string, vars: Record<string, string>): string {
 export function buildInterviewPrompt(
   role: string,
   mastery: { score: number; answered: number; correct: number },
+  lang: string,
   userName?: string,
   stack?: string[],
 ) {
@@ -40,7 +41,7 @@ export function buildInterviewPrompt(
     ? `- Tech stack: ${stack.join(", ")}`
     : "";
 
-  return fill(PROMPTS.interviewSystem, {
+  const prompt = fill(PROMPTS.interviewSystem, {
     roleLabel,
     userName: userName ?? "Anonymous",
     level,
@@ -51,15 +52,17 @@ export function buildInterviewPrompt(
     stackLine,
     label,
   });
+
+  return `${prompt}\n\nIMPORTANT: Conduct the entire interview in ${lang}. All questions, feedback, and summaries must be in ${lang}.`;
 }
 
-export async function suggestStack(role: string): Promise<string[]> {
+export async function suggestStack(role: string, lang: string): Promise<string[]> {
   const res = await client.chat.completions.create({
     model,
     messages: [
       {
         role: "system",
-        content: fill(PROMPTS.suggestStack, { role }),
+        content: `${fill(PROMPTS.suggestStack, { role })}\n\nRespond in ${lang}.`,
       },
     ],
     response_format: { type: "json_object" },
@@ -76,11 +79,12 @@ export async function suggestStack(role: string): Promise<string[]> {
 export async function startOrContinueInterview(
   role: string,
   mastery: { score: number; answered: number; correct: number },
+  lang: string,
   history: { role: "assistant" | "user"; content: string }[],
   userName?: string,
   stack?: string[],
 ) {
-  const systemPrompt = buildInterviewPrompt(role, mastery, userName, stack);
+  const systemPrompt = buildInterviewPrompt(role, mastery, lang, userName, stack);
 
   const res = await client.chat.completions.create({
     model,
@@ -97,6 +101,7 @@ export async function evaluateAnswer(
   role: string,
   question: string,
   userAnswer: string,
+  lang: string,
 ) {
   const roleLabel = getRoleLabel(role);
 
@@ -105,7 +110,7 @@ export async function evaluateAnswer(
     messages: [
       {
         role: "system",
-        content: fill(PROMPTS.evaluateSystem, { roleLabel }),
+        content: `${fill(PROMPTS.evaluateSystem, { roleLabel })}\n\nIMPORTANT: Respond in ${lang}. The feedback must be in ${lang}.`,
       },
       {
         role: "user",

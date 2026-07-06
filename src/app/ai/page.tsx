@@ -17,6 +17,7 @@ const Page = () => {
   const [step, setStep] = useState<Step>("landing");
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [selectedStack, setSelectedStack] = useState<string[]>([]);
+  const [selectedLang, setSelectedLang] = useState<string>("English");
   const { data: session, isPending } = authClient.useSession();
   const { setUserData } = useUser();
 
@@ -34,7 +35,8 @@ const Page = () => {
     setStep("stack-select");
   };
 
-  const handleStartSession = (stack: string[]) => {
+  const handleStartSession = (lang: string, stack: string[]) => {
+    setSelectedLang(lang);
     setSelectedStack(stack);
     setStep("session");
   };
@@ -52,9 +54,11 @@ const Page = () => {
     );
   }
 
+  const isSession = step === "session";
+
   return (
-    <div className="flex flex-col m-2 gap-3">
-      <Header logged={logged} session={session} />
+    <div className={isSession ? "flex flex-col" : "flex flex-col m-2 gap-3"}>
+      {!isSession && <Header logged={logged} session={session} />}
       {step === "landing" && <InterviewLanding onStart={() => setStep("role-select")} />}
       {step === "role-select" && (
         <RoleSelect
@@ -73,10 +77,11 @@ const Page = () => {
         <InterviewSession
           role={selectedRole}
           stack={selectedStack}
+          lang={selectedLang}
           onBack={() => setStep("stack-select")}
         />
       )}
-      <Footer />
+      {!isSession && <Footer />}
     </div>
   );
 };
