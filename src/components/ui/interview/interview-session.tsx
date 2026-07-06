@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../shadcn-component/button";
 import { Textarea } from "../shadcn-component/textarea";
-import { getRoleLabel } from "@/lib/ai";
+import { getRoleLabel } from "@/lib/ai-utils";
 import { Send, Loader2, ChevronLeft, Trophy } from "lucide-react";
 
 type Message = {
