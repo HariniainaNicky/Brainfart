@@ -5,7 +5,7 @@ import { CarouselDemo } from "./carousel-template";
 import { Separator } from "./shadcn-component/separator";
 import { UserHistory } from "./user-history";
 import { useRouter } from "next/navigation";
-import { Gamepad2, Users, Trophy, Sparkles } from "lucide-react";
+import { Gamepad2, Users, Trophy, Sparkles, Brain } from "lucide-react";
 
 type BodyPropsType = {
     logged: boolean;
@@ -43,6 +43,8 @@ export const Body = (props: BodyPropsType) => {
     const handlePlaySingleMode = () => {
         router.push("/single-player");
     };
+
+    const handleGoToAI = () => router.push("/ai");
 
     return (
         <div className="w-full flex flex-col gap-12 justify-center items-center px-4 relative overflow-hidden">
@@ -97,6 +99,15 @@ export const Body = (props: BodyPropsType) => {
                     >
                         <Sparkles className="size-5" />
                         {props.logged ? "Create room" : "Get started"}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={handleGoToAI}
+                        className="text-base gap-2"
+                    >
+                        <Brain className="size-5" />
+                        Brainfart AI
                     </Button>
                 </motion.div>
             </motion.div>
