@@ -299,7 +299,7 @@ export const InterviewSession = ({ role, stack, lang, initialMessages, initialMa
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed max-h-[60vh] overflow-y-auto ${
+              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground rounded-br-md"
                   : "bg-muted rounded-bl-md prose prose-sm dark:prose-invert max-w-none"
