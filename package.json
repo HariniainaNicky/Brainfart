@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.include=\"src/app/api/**\" --coverage.exclude=\"src/app/api/auth/**\"",
     "push": "git push -u origin HEAD"
   },
   "dependencies": {
@@ -67,6 +68,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "prisma": "^6.16.2",
