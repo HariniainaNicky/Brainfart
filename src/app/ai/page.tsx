@@ -172,17 +172,15 @@ const Page = () => {
         />
 
         <main className="flex-1 flex flex-col min-w-0 relative">
-          {mainView !== "session" && (
-            <div className="md:hidden absolute top-2 left-2 z-10">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="size-5" />
-              </Button>
-            </div>
-          )}
+          <div className="md:hidden absolute top-2 left-2 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="size-5" />
+            </Button>
+          </div>
 
           {mainView === "welcome" && (
             <InterviewLanding onStart={() => setMainView("role-select")} />
