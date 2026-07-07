@@ -1,13 +1,12 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { InterviewLanding } from "@/components/ui/interview/interview-landing";
 import { RoleSelect } from "@/components/ui/interview/role-select";
 import { StackSelect } from "@/components/ui/interview/stack-select";
 import { InterviewSession } from "@/components/ui/interview/interview-session";
 import { HistorySidebar, type SessionItem } from "@/components/ui/interview/history-sidebar";
-import { Header } from "@/components/ui/header";
+import { YouNeedAnAccount } from "@/components/ui/chore-component/you-need-an-account";
 import { authClient } from "@/lib/auth-client";
-import { useUser } from "@/stores/useUser";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/shadcn-component/button";
 import { Skeleton } from "@/components/ui/shadcn-component/skeleton";
@@ -27,7 +26,7 @@ type PendingSession = {
 };
 
 const Page = () => {
-  const [logged, setLogged] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
@@ -37,17 +36,6 @@ const Page = () => {
   const [selectedLang, setSelectedLang] = useState("English");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pendingNewSession, setPendingNewSession] = useState<PendingSession | null>(null);
-  const { data: session, isPending } = authClient.useSession();
-  const { setUserData } = useUser();
-
-  useEffect(() => {
-    if (session) {
-      setLogged(true);
-      setUserData(session.user);
-    } else {
-      setLogged(false);
-    }
-  }, [session, setUserData]);
 
   useEffect(() => {
     const loadSessions = async () => {
@@ -133,28 +121,22 @@ const Page = () => {
     );
   }, [activeSessionId]);
 
+  const initData = pendingNewSession?.id === activeSessionId ? pendingNewSession : null;
+
   if (isPending) {
     return (
-      <div className="flex flex-col min-h-dvh">
-        <Header logged={false} session={null} />
-        <div className="flex flex-1 p-4 gap-4">
-          <Skeleton className="hidden md:block w-[280px]" />
-          <div className="flex-1 flex flex-col gap-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="flex-1 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-dvh">
+        <Skeleton className="size-12 rounded-full" />
       </div>
     );
   }
 
-  const initData = pendingNewSession?.id === activeSessionId ? pendingNewSession : null;
+  if (!session) {
+    return <YouNeedAnAccount />;
+  }
 
   return (
-    <div className="flex flex-col min-h-dvh">
-      <Header logged={logged} session={session} />
-
+    <div className="flex flex-col h-dvh">
       <div className="flex flex-1 overflow-hidden">
         <HistorySidebar
           sessions={sessions}
@@ -172,17 +154,15 @@ const Page = () => {
         />
 
         <main className="flex-1 flex flex-col min-w-0 relative">
-          {mainView !== "session" && (
-            <div className="md:hidden absolute top-2 left-2 z-10">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="size-5" />
-              </Button>
-            </div>
-          )}
+          <div className="md:hidden absolute top-2 left-2 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="size-5" />
+            </Button>
+          </div>
 
           {mainView === "welcome" && (
             <InterviewLanding onStart={() => setMainView("role-select")} />

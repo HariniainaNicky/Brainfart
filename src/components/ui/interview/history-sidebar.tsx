@@ -38,7 +38,8 @@ export const HistorySidebar = ({
 }: Props) => {
   const sidebar = (
     <div className="flex flex-col h-full bg-card border-r">
-      <div className="p-3 border-b shrink-0">
+      <div className="p-3 border-b shrink-0 space-y-3">
+        <h1 className="text-lg font-bold tracking-tight">Brainfart AI</h1>
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-sm font-medium"
@@ -110,11 +111,6 @@ export const HistorySidebar = ({
           ))}
       </div>
 
-      <div className="p-2 border-t shrink-0">
-        <p className="text-[10px] text-muted-foreground/40 text-center">
-          Brainfart AI
-        </p>
-      </div>
     </div>
   );
 
