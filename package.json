@@ -9,6 +9,7 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "push": "git push -u origin HEAD"
   },
   "dependencies": {
