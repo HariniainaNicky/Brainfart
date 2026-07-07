@@ -55,6 +55,7 @@ export const POST = async (req: NextRequest) => {
 
       if (existingMessages.length > 0) {
         return NextResponse.json({
+          id: progress.id,
           mastery: {
             score: progress.score,
             answered: progress.answered,
@@ -82,6 +83,7 @@ export const POST = async (req: NextRequest) => {
       );
 
       return NextResponse.json({
+        id: progress.id,
         mastery: {
           score: progress.score,
           answered: progress.answered,
