@@ -2,6 +2,7 @@
   "name": "brainfart",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
   "productName": "BrainFart",
   "scripts": {
     "dev": "next dev",
@@ -9,6 +10,8 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.include=\"src/app/api/**\" --coverage.exclude=\"src/app/api/auth/**\"",
     "push": "git push -u origin HEAD"
   },
   "dependencies": {
@@ -66,12 +69,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "prisma": "^6.16.2",
     "swagger-typescript-api": "^13.2.16",
     "tsx": "^4.20.6",
     "typescript": "^5",
-    "vercel": "^53.4.0"
+    "vercel": "^53.4.0",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10"
   }
 }
