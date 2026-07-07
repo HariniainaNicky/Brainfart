@@ -5,8 +5,11 @@ import { RoleSelect } from "@/components/ui/interview/role-select";
 import { StackSelect } from "@/components/ui/interview/stack-select";
 import { InterviewSession } from "@/components/ui/interview/interview-session";
 import { HistorySidebar, type SessionItem } from "@/components/ui/interview/history-sidebar";
+import { YouNeedAnAccount } from "@/components/ui/chore-component/you-need-an-account";
+import { authClient } from "@/lib/auth-client";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/shadcn-component/button";
+import { Skeleton } from "@/components/ui/shadcn-component/skeleton";
 
 type MainView = "welcome" | "role-select" | "stack-select" | "session";
 
@@ -23,6 +26,7 @@ type PendingSession = {
 };
 
 const Page = () => {
+  const { data: session, isPending } = authClient.useSession();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
@@ -118,6 +122,18 @@ const Page = () => {
   }, [activeSessionId]);
 
   const initData = pendingNewSession?.id === activeSessionId ? pendingNewSession : null;
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-dvh">
+        <Skeleton className="size-12 rounded-full" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <YouNeedAnAccount />;
+  }
 
   return (
     <div className="flex flex-col h-dvh">
