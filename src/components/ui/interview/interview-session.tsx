@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "../shadcn-component/button";
 import { Textarea } from "../shadcn-component/textarea";
 import { getRoleLabel } from "@/lib/ai-utils";
-import { Send, Square, ChevronLeft, Trophy } from "lucide-react";
+import { Send, Square, Trophy } from "lucide-react";
 
 type Message = {
   role: "assistant" | "user";
@@ -29,7 +29,10 @@ interface Props {
   role: string;
   stack: string[];
   lang: string;
-  onBack: () => void;
+  sessionId?: string;
+  initialMessages?: Message[];
+  initialMastery?: Mastery;
+  onUpdate?: (updates: { score: number; answered: number; correct: number }) => void;
 }
 
 function ThinkingDots() {
@@ -89,16 +92,14 @@ function MarkdownContent({ content }: { content: string }) {
   );
 }
 
-export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+export const InterviewSession = ({ role, stack, lang, initialMessages, initialMastery, onUpdate }: Props) => {
+  const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [mastery, setMastery] = useState<Mastery>({
-    score: 0,
-    answered: 0,
-    correct: 0,
-  });
+  const [mastery, setMastery] = useState<Mastery>(
+    initialMastery ?? { score: 0, answered: 0, correct: 0 },
+  );
   const [error, setError] = useState<string | null>(null);
   const [lastEvaluation, setLastEvaluation] = useState<Evaluation | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -114,6 +115,8 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
   }, [messages]);
 
   useEffect(() => {
+    if (initialMessages) return;
+
     const startInterview = async () => {
       setIsProcessing(true);
       setError(null);
@@ -145,7 +148,7 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
     };
 
     startInterview();
-  }, [role, stack, lang]);
+  }, [role, stack, lang, initialMessages]);
 
   const handleStop = useCallback(() => {
     abortRef.current?.abort();
@@ -186,7 +189,10 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
         if (evalRes.ok) {
           const evaluation: Evaluation = await evalRes.json();
           setLastEvaluation(evaluation);
-          if (evaluation.mastery) setMastery(evaluation.mastery);
+          if (evaluation.mastery) {
+            setMastery(evaluation.mastery);
+            onUpdate?.(evaluation.mastery);
+          }
         }
       }
 
@@ -254,11 +260,8 @@ export const InterviewSession = ({ role, stack, lang, onBack }: Props) => {
   );
 
   return (
-    <div className="flex flex-col w-full min-h-dvh max-w-3xl mx-auto">
+    <div className="flex flex-col w-full h-full">
       <div className="flex items-center gap-3 p-4 border-b shrink-0">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ChevronLeft className="size-5" />
-        </Button>
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-lg truncate">{getRoleLabel(role)}</h2>
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
