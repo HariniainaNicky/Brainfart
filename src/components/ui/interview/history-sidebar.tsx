@@ -1,7 +1,8 @@
 "use client";
-import { MessageSquare, Plus, Trophy, X } from "lucide-react";
+import { ArrowLeft, MessageSquare, Plus, Trophy, X } from "lucide-react";
 import { Button } from "../shadcn-component/button";
 import { getRoleLabel } from "@/lib/ai-utils";
+import { useRouter } from "next/navigation";
 
 export type SessionItem = {
   id: string;
@@ -36,10 +37,17 @@ export const HistorySidebar = ({
   isOpen,
   onClose,
 }: Props) => {
+  const router = useRouter();
+
   const sidebar = (
     <div className="flex flex-col h-full bg-card border-r">
       <div className="p-3 border-b shrink-0 space-y-3">
-        <h1 className="text-lg font-bold tracking-tight">Brainfart AI</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
+            <ArrowLeft className="size-4" />
+          </Button>
+          <h1 className="text-lg font-bold tracking-tight">Brainfart AI</h1>
+        </div>
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-sm font-medium"
