@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "../shadcn-component/button";
 import { Textarea } from "../shadcn-component/textarea";
 import { getRoleLabel } from "@/lib/ai-utils";
-import { Send, Square, Trophy } from "lucide-react";
+import { Send, Square } from "lucide-react";
 
 type Message = {
   role: "assistant" | "user";
@@ -261,35 +261,8 @@ export const InterviewSession = ({ role, stack, lang, initialMessages, initialMa
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex items-center gap-3 p-4 border-b shrink-0">
-        <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-lg truncate">{getRoleLabel(role)}</h2>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-            <span>Score: {mastery.score}</span>
-            <span>Answered: {mastery.answered}</span>
-            <span>
-              Accuracy:{" "}
-              {mastery.answered > 0
-                ? `${Math.round((mastery.correct / mastery.answered) * 100)}%`
-                : "N/A"}
-            </span>
-            <Trophy className="size-3 shrink-0" />
-            <span>
-              {mastery.score >= 1000
-                ? "Expert"
-                : mastery.score >= 600
-                  ? "Senior"
-                  : mastery.score >= 300
-                    ? "Mid"
-                    : mastery.score >= 100
-                      ? "Junior"
-                      : "Beginner"}
-            </span>
-            <span className="text-xs uppercase text-muted-foreground/60">
-              {lang}
-            </span>
-          </div>
-        </div>
+      <div className="flex items-center p-4 border-b shrink-0">
+        <h2 className="font-semibold text-lg truncate">{getRoleLabel(role)}</h2>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
