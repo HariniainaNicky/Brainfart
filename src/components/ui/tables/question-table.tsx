@@ -50,9 +50,9 @@ export const QuestionsTable = (props: QuestionsTableProps) => {
       {props.loading? <div className="flex flex-row justify-center items-center p-5"><Spinner /></div> : <Table className="min-w-[400px] md:min-w-[600px] lg:min-w-[800px]">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[5%] text-left">Type</TableHead>
-            <TableHead className="text-left w-[20%]">Question</TableHead>
-            <TableHead className="text-left w-[10%]">Answer</TableHead>
+            <TableHead className="w-[15%] text-left">Type</TableHead>
+            <TableHead className="text-left w-[50%]">Question</TableHead>
+            <TableHead className="text-left w-[35%]">Answer</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -60,7 +60,7 @@ export const QuestionsTable = (props: QuestionsTableProps) => {
             <TableRow
               key={question.id}
             >
-              <TableCell>{question.typeId.slice(2).toUpperCase()}</TableCell>
+              <TableCell>{question.type?.name ?? question.typeId ?? "—"}</TableCell>
               <TableCell>{question.question}</TableCell>
               <TableCell>{question.Answer}</TableCell>
             </TableRow>
