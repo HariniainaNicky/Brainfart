@@ -10,19 +10,13 @@ import {
   TableCell,
   Table,
 } from "../shadcn-component/table";
-import { useEffect } from "react";
 
 type UserTablePropsType = {
   users: User[];
-  handleRefresh: () => void;
 };
 
-export const UserTable = ({ users, handleRefresh  }: UserTablePropsType) => {
+export const UserTable = ({ users }: UserTablePropsType) => {
   const router = useRouter();
-
-  useEffect(() => {
-    console.log("UserTable rendered");
-  }, [handleRefresh]);
 
   return (
     <div className="shadow-2xl dark:shadow-primary/20 max-w-full overflow-x-hidden border rounded-lg">
