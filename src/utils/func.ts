@@ -172,10 +172,6 @@ export const createRoom = async (data: RoomDto) => {
     }
 };
 
-export const copyToClipboard = async () => {
-    // TODO: complete later
-};
-
 // TODO: Search how to do generics with arrowed function
 export function filterSearchRoom(initialData: Room[], queryString: string) {
     return initialData.filter((room: Room) => {
