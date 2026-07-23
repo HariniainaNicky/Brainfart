@@ -13,9 +13,10 @@ import {
 
 type UserTablePropsType = {
   users: User[];
+  handleRefresh: () => void;
 };
 
-export const UserTable = ({ users }: UserTablePropsType) => {
+export const UserTable = ({ users, handleRefresh }: UserTablePropsType) => {
   const router = useRouter();
 
   return (
