@@ -155,13 +155,11 @@ export const getAllQuestions = async (
     }
 };
 
-export const getMaxPage = async function <t>(
-    data: t[],
-    _page: number,
+export const getMaxPage = function <T>(
+    data: T[],
     limit: number,
 ) {
-    const maxPage = Math.round(data.length / limit);
-    return maxPage;
+    return Math.ceil(data.length / limit);
 };
 
 export const createRoom = async (data: RoomDto) => {
