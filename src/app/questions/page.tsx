@@ -23,7 +23,7 @@ const Page = () => {
     const [showSubmitQuestion, setShowSubmitQuestion] = useState(false);
     const [maxPage, setMaxPage] = useState<number>(1);
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [fetchedQuestions, setFetchedQuestions] = useState<Question[]>(
         [],
     );
