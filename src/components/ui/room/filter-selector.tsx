@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -5,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../shadcn-component/select";
+import { Type } from "@/types/db";
 
 type FilterSelectorProps = {
   setTypeId: (value: string) => void;
@@ -12,6 +14,21 @@ type FilterSelectorProps = {
 };
 
 export const FilterSelector = ({ setTypeId, typeId }: FilterSelectorProps) => {
+  const [types, setTypes] = useState<Type[]>([]);
+
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const res = await fetch("/api/types");
+        const data = await res.json();
+        setTypes(data.data);
+      } catch {
+        // silently fail
+      }
+    };
+    fetchTypes();
+  }, []);
+
   return (
     <Select value={typeId} onValueChange={setTypeId}>
       <SelectTrigger className="w-[250px]">
@@ -20,18 +37,11 @@ export const FilterSelector = ({ setTypeId, typeId }: FilterSelectorProps) => {
 
       <SelectContent>
         <SelectItem value="null">All</SelectItem>
-        <SelectItem value="t-ai">Artificial Intelligence</SelectItem>
-        <SelectItem value="t-algo">Algorithms</SelectItem>
-        <SelectItem value="t-db">Databases</SelectItem>
-        <SelectItem value="t-ds">Data Structures</SelectItem>
-        <SelectItem value="t-misc">Miscellaneous</SelectItem>
-        <SelectItem value="t-net">Computer Networks</SelectItem>
-        <SelectItem value="t-os">Operating Systems</SelectItem>
-        <SelectItem value="t-prog">Programming Languages</SelectItem>
-        <SelectItem value="t-se">Software Engineering</SelectItem>
-        <SelectItem value="t-sec">Cybersecurity</SelectItem>
-        <SelectItem value="t-theory">Theory of Computation</SelectItem>
-        <SelectItem value="t-web">Web Development</SelectItem>
+        {types.map((type) => (
+          <SelectItem key={type.id} value={type.id}>
+            {type.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

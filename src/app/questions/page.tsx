@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { FilterSelector } from "@/components/ui/room/filter-selector";
 import { useForm } from "react-hook-form";
@@ -25,7 +23,7 @@ const Page = () => {
     const [showSubmitQuestion, setShowSubmitQuestion] = useState(false);
     const [maxPage, setMaxPage] = useState<number>(1);
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [fetchedQuestions, setFetchedQuestions] = useState<Question[]>(
         [],
     );
@@ -71,21 +69,20 @@ const Page = () => {
 
     useEffect(() => {
         const fetchQuestions = async () => {
-            const questions = await getAllQuestions(
-                searchValue,
-                typeId,
-            );
+            setLoading(true);
+            const questions = await getAllQuestions(searchValue, typeId);
             setFetchedQuestions(questions);
-            const maxPage = await getMaxPage(questions ,page, 10);
-            setMaxPage(Math.round(maxPage));
-            setPaginateQuestions(paginate(questions, page, 10));
+            setMaxPage(getMaxPage(questions, 10));
+            setPage(1);
+            setPaginateQuestions(paginate(questions, 1, 10));
+            setLoading(false);
         };
         fetchQuestions();
     }, [typeId]);
 
     useEffect(() => {
         setPaginateQuestions(paginate(fetchedQuestions, page, 10));
-    }, [page]);
+    }, [page, fetchedQuestions]);
 
     const handleGoSubmitButton = () => {
         if (!session) {
@@ -98,16 +95,12 @@ const Page = () => {
     const handleSearch = async () => {
         try {
             setLoading(true);
-            setPage(1);
-            const questions = await getAllQuestions(
-                searchValue,
-                typeId,
-            );
+            const questions = await getAllQuestions(searchValue, typeId);
             setFetchedQuestions(questions);
-            const maxPage = await getMaxPage(questions, page, 10);
-            setMaxPage(Math.round(maxPage));
+            setMaxPage(getMaxPage(questions, 10));
+            setPage(1);
+            setPaginateQuestions(paginate(questions, 1, 10));
             setLoading(false);
-            setPaginateQuestions(paginate(questions, page, 10));
             toast.success("Questions searched successfully!");
         } catch (error) {
             console.error(error);

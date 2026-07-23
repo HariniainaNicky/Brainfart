@@ -31,8 +31,8 @@ export const generateImage = async (userId: string) => {
             "https://api.dicebear.com/9.x/fun-emoji/svg?scale=100&seed=" +
             userId;
         return url as string;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -52,8 +52,8 @@ export const setUserImage = async (
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -61,10 +61,8 @@ export const initializeRank = async (userId: string) => {
     try {
         const usersRes = await fetch("/api/users");
         const users = await usersRes.json();
-        console.log(users);
         const userCount = users.data.length;
         const url = `/api/users/${userId}/rank`;
-        console.log(userCount);
         const res = await fetch(url, {
             method: "PATCH",
             headers: {
@@ -76,8 +74,8 @@ export const initializeRank = async (userId: string) => {
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -89,8 +87,8 @@ export const refreshRanks = async (userId: string) => {
             body: JSON.stringify({}),
         });
         return await res.json();
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -99,11 +97,9 @@ export const getUsersWithCriteria = async (criteria: string) => {
     try {
         const url = `/api/users?criteria=${criteria}`;
         const res = await fetch(url);
-        const data = await res.json();
-        console.log(data);
-        return data;
-    } catch (error) {
-        console.log(error);
+        return await res.json();
+    } catch {
+        return undefined;
     }
 };
 
@@ -112,10 +108,9 @@ export const getType = async () => {
         const url = `/api/types`;
         const res = await fetch(url);
         const data = await res.json();
-        console.log(data);
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -127,10 +122,9 @@ export const getQuestions = async (
         const url = `/api/questions/${type}?numberOfQuestion=${numberOfQuestion}`;
         const res = await fetch(url);
         const data = await res.json();
-        console.log(data);
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -148,20 +142,17 @@ export const getAllQuestions = async (
         }
         const res = await fetch(url);
         const data = await res.json();
-        console.log(data);
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
-export const getMaxPage = async function <t>(
-    data: t[],
-    _page: number,
+export const getMaxPage = function <T>(
+    data: T[],
     limit: number,
 ) {
-    const maxPage = Math.round(data.length / limit);
-    return maxPage;
+    return Math.ceil(data.length / limit);
 };
 
 export const createRoom = async (data: RoomDto) => {
@@ -176,13 +167,9 @@ export const createRoom = async (data: RoomDto) => {
         });
         const dataRes = await res.json();
         return dataRes;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
-};
-
-export const copyToClipboard = async () => {
-    // TODO: complete later
 };
 
 // TODO: Search how to do generics with arrowed function
@@ -197,8 +184,8 @@ export const fetchRoomById = async (userId: string) => {
         const res = await fetch("/api/rooms/" + userId);
         const data = await res.json();
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -207,8 +194,8 @@ export const fetchClosedRooms = async () => {
         const res = await fetch("/api/rooms?closed=true");
         const data = await res.json();
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -226,8 +213,8 @@ export const insertRoomPlayer = async (roomId: string, userId: string) => {
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -237,8 +224,8 @@ export const fetchMissingField = async (userId: string) => {
         const res = await fetch(url);
         const data = await res.json();
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -250,8 +237,8 @@ export const closeRoomById = async (roomId: string) => {
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -263,8 +250,8 @@ export const quitRoom = async (roomId: string, userId: string) => {
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -277,8 +264,8 @@ export const submitRoomScore = async (roomId: string, userId: string, score: num
             body: JSON.stringify({ userId, score, finished }),
         });
         return await res.json();
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -288,8 +275,8 @@ export const fetchRoomScores = async (roomId: string) => {
         const res = await fetch(url);
         const data = await res.json();
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -299,8 +286,8 @@ export const getRandomAnswer = async () => {
         const res = await fetch(url);
         const data = await res.json();
         return data.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -315,7 +302,6 @@ export const shuffleArray = <T>(array: T[]): T[] => {
 
 export const updateUserScore = async (score: number, userId: string) => {
     try {
-        // CHANGE THIS LATER
         const url = `/api/users/${userId}/`;
         const res = await fetch(url, {
             method: "PATCH",
@@ -328,8 +314,8 @@ export const updateUserScore = async (score: number, userId: string) => {
         });
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log(error);
+    } catch {
+        return undefined;
     }
 };
 
@@ -360,8 +346,8 @@ export const markNotificationAsRead = async (notificationId: string) => {
                 seen: true,
             }),
         });
-    } catch (error) {
-        console.log(error);
+    } catch {
+        // silently fail
     }
 };
 
@@ -371,7 +357,7 @@ export const deleteNotification = async (notificationId: string) => {
         await fetch(url, {
             method: "DELETE",
         });
-    } catch (error) {
-        console.log(error);
+    } catch {
+        // silently fail
     }
 };

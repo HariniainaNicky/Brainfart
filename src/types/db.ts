@@ -37,13 +37,12 @@ export type Room = {
 export type Question = {
     id: string;
     question: string;
-    typeId: string;
-    type: Type;
+    typeId: string | null;
+    type?: Type | null;
     Score: number;
     Answer: string;
-    roomId: string;
-    room: Room;
     isValidated: boolean;
+    userId?: string | null;
 };
 
 export type Type = {

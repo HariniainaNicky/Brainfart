@@ -28,6 +28,7 @@ export const GET = async (req: NextRequest) => {
                                       isValidated: true,
                                   }
                                 : undefined,
+                        include: { type: true },
                         orderBy: { typeId: "asc" },
                     });
                     return NextResponse.json(
@@ -46,6 +47,7 @@ export const GET = async (req: NextRequest) => {
                               isValidated: true,
                           }
                         : undefined,
+                    include: { type: true },
                     orderBy: { typeId: "asc" },
                 });
                 return NextResponse.json({ data: questions }, { status: 200 });
@@ -56,6 +58,7 @@ export const GET = async (req: NextRequest) => {
                         where: typeId
                             ? { typeId: typeId, isValidated: true }
                             : undefined,
+                        include: { type: true },
                         orderBy: { typeId: "asc" },
                     });
                     return NextResponse.json(
@@ -67,6 +70,7 @@ export const GET = async (req: NextRequest) => {
 
             questions = await prisma.question.findMany({
                 where: { isValidated: true },
+                include: { type: true },
                 orderBy: { typeId: "asc" },
             });
         } else {
