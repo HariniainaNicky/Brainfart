@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { FilterSelector } from "@/components/ui/room/filter-selector";
 import { useForm } from "react-hook-form";
