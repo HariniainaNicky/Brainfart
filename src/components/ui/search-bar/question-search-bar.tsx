@@ -10,7 +10,14 @@ type QuestionSearchBarProps = {
 
 export const QuestionSearchBar = (props: QuestionSearchBarProps) => {
     return <div className="flex flex-row gap-2 items-center justify-center">
-        <Input placeholder="Search Questions" value={props.searchValue} onChange={(e) => props.setSearchValue(e.target.value)} />
+        <Input
+            placeholder="Search Questions"
+            value={props.searchValue}
+            onChange={(e) => props.setSearchValue(e.target.value)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") props.handleSearch();
+            }}
+        />
         <Button variant="outline" onClick={props.handleClearValue}>Clear</Button>
         <Button variant="default" onClick={props.handleSearch}>Search</Button>
     </div>
