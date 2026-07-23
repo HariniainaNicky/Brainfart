@@ -17,17 +17,20 @@ export const updateUserProfile = async (id: string, url: string) => {
 
 export const updateUserRank = async () => {
   try {
-    // A special query for updating global rank.
     await prisma.$executeRaw`
     UPDATE "User"
     SET rank = (
-      SELECT COUNT(*) + 1
-      FROM "User" u2
-      WHERE u2."highestScore" > "User"."highestScore"
+      SELECT rank FROM (
+        SELECT id, DENSE_RANK() OVER (
+          ORDER BY "highestScore" DESC, "createdAt" ASC
+        ) as rank
+        FROM "User"
+      ) ranked
+      WHERE ranked.id = "User".id
     )
   `;
-  } catch (error) {
-    console.log(error);
+  } catch {
+    // silently fail
   }
 };
 
