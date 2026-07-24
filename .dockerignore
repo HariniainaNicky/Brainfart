@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.gitignore
+coverage
+.opencode
+.env*
+!.env.example
+*.md
+.vercel
+*.tsbuildinfo
