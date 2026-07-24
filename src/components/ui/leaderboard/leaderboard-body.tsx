@@ -12,7 +12,6 @@ export const LeaderboardBody = () => {
   const [users, setUsers] = useState<User[]>([]);
   const { data: session, isPending } = authClient.useSession();
 
-
   useEffect(() => {
     const fetchUsersRanked = async () => {
       const users = await getUsersWithCriteria("rank");
@@ -40,7 +39,6 @@ export const LeaderboardBody = () => {
     );
   }
 
-  console.log(users);
   return <div className="flex flex-col gap-5 items-center justify-center m-4">
     <Button variant="secondary" onClick={handleRefresh}>Refresh leaderboard</Button>
     {users.length === 0 ? <Spinner /> : <UserTable users={users} handleRefresh={handleRefresh}/>}

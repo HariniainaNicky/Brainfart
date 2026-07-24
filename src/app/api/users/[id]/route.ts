@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyOwnership } from "@/lib/auth-utils";
 import { validateBody, updateScoreSchema } from "@/lib/validation";
+import { updateUserRank } from "@/services/user";
 
 export const GET = async (
   _req: NextRequest,
@@ -98,6 +99,8 @@ export const PATCH = async (  req: NextRequest, context: RouteContext<"/api/user
         highestScore,
       },
     });
+
+    await updateUserRank();
 
     return NextResponse.json(
       {
