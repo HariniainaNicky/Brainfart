@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────
+# Project
+# ─────────────────────────────────────────────
+vercel_project_name = "brainfart"
+github_repo         = "NickyHariniaina/Brainfart"
+github_branch       = "main"
+root_directory      = null
+
+# ─────────────────────────────────────────────
+# Domain (leave empty to skip)
+# ─────────────────────────────────────────────
+domain_name = ""

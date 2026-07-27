@@ -1,4 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.terraform.enl
 todo.md
 # dependencies
 /node_modules
@@ -36,3 +37,18 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# ── Terraform ──────────────────────────────────
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.rc
+terraform.rc
