@@ -56,6 +56,76 @@
 
 **UI components:** Radix UI primitives, Lucide icons, Framer Motion, react-hook-form, sonner (toasts), typed.js
 
+## Infrastructure
+
+### Terraform (IaC)
+
+Infrastructure is managed with [Terraform](https://www.terraform.io/) using the [Vercel Provider](https://registry.terraform.io/providers/vercel/vercel/latest).
+
+```
+terraform/
+├── main.tf                  # Vercel project, domain, deployment
+├── variables.tf             # Input variables
+├── outputs.tf               # Project ID, URLs
+└── terraform.tfvars.example # Template (gitignored: terraform.tfvars)
+```
+
+#### Prerequisites
+
+- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.0
+- [Vercel CLI](https://vercel.com/docs/cli) (optional, for env var management)
+- Vercel API token with **Full Access** scope
+
+#### Quick Start
+
+```bash
+# 1. Set Vercel API token
+export VERCEL_API_TOKEN="your_token_here"
+
+# 2. Initialize Terraform
+pnpm tf:init
+
+# 3. Preview changes
+pnpm tf:plan
+
+# 4. Import existing project (if already deployed)
+pnpm tf:import vercel_project.brainfart YOUR_PROJECT_ID
+
+# 5. Apply infrastructure
+pnpm tf:apply
+```
+
+#### Managing Infrastructure
+
+```bash
+# Preview what Terraform will change
+pnpm tf:plan
+
+# Apply changes to Vercel
+pnpm tf:apply
+
+# Destroy all managed resources
+pnpm tf:destroy
+
+# Import existing Vercel resources
+pnpm tf:import <resource_type> <resource_id>
+```
+
+#### Terraform Commands
+
+| Script | Description |
+|---|---|
+| `pnpm tf:init` | Initialize Terraform providers |
+| `pnpm tf:plan` | Preview infrastructure changes |
+| `pnpm tf:apply` | Apply changes to Vercel |
+| `pnpm tf:destroy` | Destroy all managed resources |
+
+#### Environment Variables
+
+Environment variables are managed in the [Vercel Dashboard](https://vercel.com/dashboard) under **Settings → Environment Variables**. Terraform manages project configuration, git integration, and domains.
+
+**Why separate?** Sensitive values (API keys, secrets) are easier to manage via Vercel's UI or CLI without exposing them in Terraform state files.
+
 ## Getting Started
 
 ### Prerequisites
@@ -122,6 +192,10 @@ Copy `.env.example` and fill in:
 ```
 brainfart/
 ├── prisma/                  # Prisma schema (PostgreSQL)
+├── terraform/               # Infrastructure as Code
+│   ├── main.tf              #   Vercel project & domain
+│   ├── variables.tf         #   Input variables
+│   └── outputs.tf           #   Project ID, URLs
 ├── src/
 │   ├── app/                 # Next.js App Router
 │   │   ├── admin/           #   Admin panel (users, rooms, questions)
@@ -146,8 +220,7 @@ brainfart/
 │   ├── types/               # TypeScript type definitions
 │   └── utils/               # Utility functions (CRUD wrappers, helpers)
 ├── public/                  # Static assets
-├── vitest.config.ts         # Test configuration
-└── render.yaml              # Render.com deployment config
+└── vitest.config.ts         # Test configuration
 ```
 
 ## Scripts
@@ -233,16 +306,33 @@ Powered by [Better Auth](https://www.better-auth.com/) with:
 
 ## Deployment
 
-### Vercel (recommended)
+### Vercel (Recommended)
 
+#### Automated (Terraform)
+```bash
+pnpm tf:init
+pnpm tf:apply
+```
+
+#### Manual
 1. Push to GitHub
 2. Import repo at [vercel.com/new](https://vercel.com/new)
-3. Set environment variables
+3. Set environment variables in dashboard
 4. Deploy — Vercel auto-detects Next.js
 
 ### Render
 
 A `render.yaml` is included for Render.com deployment.
+
+## CI/CD
+
+### Pre-commit Hooks
+- **Commitizen** enforced via `.pre-commit-config.yaml`
+- Validates commit format: `<type>(<scope>): <description>`
+
+### Pre-push Hooks
+- Validates branch commits
+- Runs lint checks
 
 ## Contributing
 
@@ -261,5 +351,3 @@ cz commit
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`
 
 **Branch workflow:** Feature branches from `main`, push with `pnpm push` (runs `git push -u origin HEAD`).
-
-**Pre-commit hooks** are enforced via `pre-commit-config.yaml`. **Pre-push hooks** validate branch commits.

@@ -29,8 +29,6 @@ resource "vercel_project" "brainfart" {
   install_command  = "pnpm install"
   output_directory = ".next"
   root_directory   = var.root_directory
-
-  ignore_command = "fn() { echo \"$VERCEL_GIT_COMMIT_MESSAGE\" | grep -qE '\\[skip ci\\]' && exit 0 || exit 1 }"
 }
 
 # ─────────────────────────────────────────────
