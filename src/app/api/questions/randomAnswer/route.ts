@@ -4,6 +4,7 @@ export const GET = async () => {
   try {
     const answers = await prisma.$queryRaw`
       SELECT "Answer" FROM "public"."Question"
+      WHERE "isValidated" = true
       ORDER BY RANDOM()
       LIMIT 3;
     `

@@ -1,5 +1,6 @@
 "use client"
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions, updateUserScore } from "@/utils/func";
+import { topicLabel } from "@/lib/topics";
 import { useEffect } from "react";
 import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
@@ -44,9 +45,13 @@ export const SinglePlayerMode = () => {
     const question = questions[currentQuestionCount];
     if (!question) return;
 
-    const fetchRandomAnswer = async () => {
+    const fetchChoices = async () => {
       setRandomAnswer([]);
       setCheckedAnswer([]);
+      if (question.options && question.options.length >= 2) {
+        setRandomAnswer(shuffleArray(question.options));
+        return;
+      }
       const wrongAnswers = await getRandomAnswerApi();
 
       const answers: string[] = shuffleArray([
@@ -57,7 +62,7 @@ export const SinglePlayerMode = () => {
       setRandomAnswer(answers);
     };
 
-    fetchRandomAnswer();
+    fetchChoices();
   }, [currentQuestionCount, questions]);
 
   const handleStart = async () => {
@@ -170,7 +175,7 @@ export const SinglePlayerMode = () => {
               >
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">
-                    {question.typeId?.split("-")[1]?.toUpperCase() || "MISC"}
+                    {topicLabel(question.typeId)}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
                     {currentQuestionCount + 1} / {questions.length}

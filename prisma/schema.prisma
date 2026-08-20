@@ -79,6 +79,9 @@ model Question {
   type     Type?    @relation(fields: [typeId], references: [id])
   Score    Int
   Answer   String
+  options   String[] @default([])
+  difficulty String?
+  source    String? @default("user")
   isValidated Boolean @default(true)
 
   rooms    Room[]
@@ -96,9 +99,10 @@ model Notification {
 }
 
 model Type {
-  id        String     @id
-  name      String     @unique
-  questions Question[]
+  id            String     @id
+  name          String     @unique
+  apiCategoryId Int?       @unique
+  questions     Question[]
 }
 
 model Session {

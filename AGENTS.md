@@ -13,6 +13,7 @@ pnpm start               # next start
 pnpm lint                # ESLint
 pnpm test                # Vitest (test/unit, test/integration)
 pnpm coverage            # Vitest coverage on src/app/api/** (excl. auth)
+pnpm db:seed             # prisma db seed (syncs OpenTDB categories + imports questions)
 pnpm push                # git push -u origin HEAD
 pnpm tf:init|plan|apply|destroy  # Terraform for Vercel (needs VERCEL_API_TOKEN)
 ```
@@ -20,12 +21,20 @@ pnpm tf:init|plan|apply|destroy  # Terraform for Vercel (needs VERCEL_API_TOKEN)
 - **No `typecheck` script.** `pnpm build` (next build) is the closest full verification.
 - **`postinstall`** auto-runs `prisma generate`.
 - Prisma client generates to `src/generated/prisma/` (gitignored) — run `pnpm prisma generate` after a fresh clone or schema change before tests/typecheck.
+- **No CI.** `test.yml`/`coverage.yml` were removed — verification happens manually or in prod.
 
 ## Tests (Vitest)
 
 - `test/unit/` and `test/integration/` — node env, no DB required.
-- CI (`.github/workflows/{test,coverage}.yml`) runs `pnpm install && pnpm prisma generate && pnpm test` on Node 22. Coverage thresholds (50%) are enforced only in CI.
 - Single test: `pnpm vitest run test/integration/api/users/users.test.ts`
+
+## Trivia (multi-topic via OpenTDB)
+
+- Questions are sourced from the **Open Trivia Database** (no API key). `src/lib/trivia.ts` syncs categories and imports questions.
+- Gameplay is cache-through: `GET /api/questions/[type]` lazy-fetches + stores questions when a topic's local pool is short, so the DB serves games.
+- `src/lib/topics.ts` holds the client-safe slug→label map (used for the badge — do NOT use the old `typeId.split("-")[1]` hack).
+- Questions store real multiple-choice choices in `Question.options`; imported rows are `source: "opentdb"`, `isValidated: true`.
+- Admin bulk import: `POST /api/admin/trivia/sync` (`{ categoryId?, amount? }`, admin only).
 
 ## Tech Stack
 

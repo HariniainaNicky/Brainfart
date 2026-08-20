@@ -11,12 +11,16 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "db:seed": "prisma db seed",
     "coverage": "vitest run --coverage --coverage.include=\"src/app/api/**\" --coverage.exclude=\"src/app/api/auth/**\"",
     "push": "git push -u origin HEAD",
     "tf:init": "terraform -chdir=terraform init",
     "tf:plan": "terraform -chdir=terraform plan",
     "tf:apply": "terraform -chdir=terraform apply",
     "tf:destroy": "terraform -chdir=terraform destroy"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

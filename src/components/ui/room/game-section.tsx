@@ -11,6 +11,7 @@ import { Separator } from "../shadcn-component/separator";
 import { Button } from "../shadcn-component/button";
 import { useEffect, useState } from "react";
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray } from "@/utils/func";
+import { topicLabel } from "@/lib/topics";
 import { Session } from "@/types/better-auth";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -60,9 +61,13 @@ export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
     const question = questions[currentQuestionCount];
     if (!question) return;
 
-    const fetchRandomAnswer = async () => {
+    const fetchChoices = async () => {
       setRandomAnswer([]);
       setCheckedAnswer([]);
+      if (question.options && question.options.length >= 2) {
+        setRandomAnswer(shuffleArray(question.options));
+        return;
+      }
       const wrongAnswers = await getRandomAnswerApi();
 
       const answers: string[] = shuffleArray([
@@ -73,7 +78,7 @@ export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
       setRandomAnswer(answers);
     };
 
-    fetchRandomAnswer();
+    fetchChoices();
   }, [currentQuestionCount, questions]);
 
   if (questionsLoading) {
@@ -164,7 +169,7 @@ export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
           >
             <div className="flex items-center gap-2">
               <Badge variant="outline">
-                {question.typeId?.split("-")[1]?.toUpperCase() || "MISC"}
+                {topicLabel(question.typeId)}
               </Badge>
               <span className="text-xs text-muted-foreground">
                 {currentQuestionCount + 1} / {questions.length}

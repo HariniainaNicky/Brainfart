@@ -9,6 +9,7 @@
 ### Trivia Game
 - Create and join multiplayer trivia rooms with custom settings
 - Single-player mode for solo practice
+- 24 topics (General Knowledge, Science, Geography, History, Sports, Film, Music, ...) sourced from the Open Trivia Database (CC BY-SA 4.0)
 - Configurable question types, counts, and timers
 - Real-time score tracking and winner determination
 - Global leaderboard with rank system

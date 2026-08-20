@@ -41,6 +41,9 @@ export type Question = {
     type?: Type | null;
     Score: number;
     Answer: string;
+    options?: string[];
+    difficulty?: string | null;
+    source?: string | null;
     isValidated: boolean;
     userId?: string | null;
 };
@@ -48,6 +51,7 @@ export type Question = {
 export type Type = {
     id: string;
     name: string;
+    apiCategoryId?: number | null;
     questions: Question[];
 };
 
