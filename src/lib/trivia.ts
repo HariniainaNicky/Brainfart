@@ -18,11 +18,6 @@ export type TriviaQuestion = {
   incorrect_answers: string[];
 };
 
-// Existing manual type slugs mapped to their OpenTDB category id.
-const TYPE_TO_API_CATEGORY: Record<string, number> = {
-  "computer-science": 18, // Science: Computers
-};
-
 const shuffle = <T>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -61,8 +56,7 @@ export const syncTriviaCategories = async () => {
   const categories = await fetchTriviaCategories();
   const results: { id: string; apiCategoryId: number; name: string }[] = [];
   for (const category of categories) {
-    const id =
-      TYPE_TO_API_CATEGORY[slugify(category.name)] ?? slugify(category.name);
+    const id = slugify(category.name);
     await prisma.type.upsert({
       where: { apiCategoryId: category.id },
       create: {
