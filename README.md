@@ -1,6 +1,6 @@
 # BrainFart
 
-> Real-time multiplayer trivia game with AI-powered mock interviews.
+> Real-time multiplayer trivia game.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://brainfart.vercel.app)
 
@@ -12,13 +12,6 @@
 - Configurable question types, counts, and timers
 - Real-time score tracking and winner determination
 - Global leaderboard with rank system
-
-### AI Mock Interviews
-- 26 tech roles (Backend, Frontend, DevOps, Data Science, ML, Cybersecurity, etc.)
-- AI-suggested tech stacks based on role
-- Streaming chat-based interview sessions
-- Answer evaluation with scoring and mastery tracking
-- Session history with persistent progress
 
 ### Authentication & Users
 - Email/password registration with verification
@@ -175,18 +168,6 @@ Copy `.env.example` and fill in:
 | `NODEMAILER_USER` | Gmail address for sending emails |
 | `NODEMAILER_APP_PASSWORD` | Gmail app password |
 
-### Optional — AI Interview
-
-| Variable | Description |
-|---|---|
-| `OPENCODE_API_KEY` | API key for AI completions |
-| `AI_MODEL` | Model name for AI completions |
-| `AI_PROMPT_SUGGEST_STACK` | System prompt for stack suggestion |
-| `AI_PROMPT_INTERVIEW_SYSTEM` | System prompt for interview conductor |
-| `AI_PROMPT_EVALUATE_SYSTEM` | System prompt for answer evaluation |
-| `AI_PROMPT_EVALUATE_USER` | User prompt template for evaluation |
-| `AI_PROMPT_START_MESSAGE` | Initial AI message in interview |
-
 ## Project Structure
 
 ```
@@ -199,7 +180,6 @@ brainfart/
 ├── src/
 │   ├── app/                 # Next.js App Router
 │   │   ├── admin/           #   Admin panel (users, rooms, questions)
-│   │   ├── ai/              #   AI mock interview
 │   │   ├── api/             #   API routes (28 endpoints)
 │   │   ├── auth/            #   Sign in, sign up, onboarding
 │   │   ├── leaderboard/     #   Global rankings
@@ -214,7 +194,7 @@ brainfart/
 │   │   ├── ui/              #   Page & feature components
 │   │   └── ui/shadcn-component/  # shadcn/ui (24 components)
 │   ├── hooks/               # Custom React hooks
-│   ├── lib/                 # Auth, AI client, utilities, validation
+│   ├── lib/                 # Auth, utilities, validation
 │   ├── services/            # Database service layer
 │   ├── stores/              # Zustand stores (useLogged, useUser)
 │   ├── types/               # TypeScript type definitions
@@ -264,13 +244,6 @@ brainfart/
 | `PUT` | `/api/rooms/[id]/players` | Add player |
 | `PATCH` | `/api/rooms/[id]/scores` | Update score |
 
-### AI Interview
-| Method | Route | Description |
-|---|---|---|
-| `POST` | `/api/ai/interview` | Suggest stack, start, chat (streaming), evaluate |
-| `GET` | `/api/ai/sessions` | List interview sessions |
-| `DELETE` | `/api/ai/sessions/[id]` | Delete session |
-
 ### Admin (admin role required)
 | Method | Route | Description |
 |---|---|---|
@@ -286,12 +259,10 @@ brainfart/
 
 Key models and relationships:
 
-- **User** — sessions, accounts, created questions, opened/won/joined rooms, interview progress
+- **User** — sessions, accounts, created questions, opened/won/joined rooms
 - **Room** — opened by user, winner, players (many-to-many), questions (many-to-many), scores
 - **Question** — created by user, belongs to type, shared across rooms
 - **RoomPlayerScore** — tracks per-player scores per room (composite key: roomId + userId)
-- **InterviewProgress** — per-user per-role interview state with mastery score
-- **InterviewMessage** — chat messages for interview sessions
 - **Notification** — in-app notifications with soft delete
 - **Session / Account** — Better Auth managed (30-day sessions, 7-day refresh)
 

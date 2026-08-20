@@ -40,7 +40,6 @@ model User {
   wonRooms     Room[] @relation("Winner")
   joinedRooms  Room[] @relation("RoomPlayers")
   roomScores   RoomPlayerScore[]
-  interviewProgress InterviewProgress[]
 }
 
 model Room {
@@ -94,31 +93,6 @@ model Notification {
     isDeleted Boolean  @default(false)
     body      String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model InterviewProgress {
-  id        String             @id
-  userId    String
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      String
-  stack     String[]           @default([])
-  lang      String             @default("English")
-  score     Int                @default(0)
-  answered  Int                @default(0)
-  correct   Int                @default(0)
-  updatedAt DateTime           @updatedAt
-  messages  InterviewMessage[]
-
-  @@unique([userId, role])
-}
-
-model InterviewMessage {
-  id         String           @id
-  progressId String
-  progress   InterviewProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
-  role       String
-  content    String
-  createdAt  DateTime         @default(now())
 }
 
 model Type {
