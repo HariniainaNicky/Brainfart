@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./shadcn-component/dropdown-menu";
+import { DailyStreak } from "./daily/daily-streak";
 
 type HeaderPropsType = {
     logged: boolean | undefined;
@@ -184,7 +185,8 @@ export const Header = (props: HeaderPropsType) => {
             </div>
 
             {props.logged ? (
-                <div className="flex flex-row items-center p-2 gap-2 sm:gap-3">
+                <div className="flex flex-row items-center p-2 gap-1 sm:gap-2">
+                    <DailyStreak />
                     <Button variant="ghost" size="icon" className="relative" onClick={handleGoTonotification}>
                         <Bell className="size-5" />
                         {containsNotificationUnseen ? (

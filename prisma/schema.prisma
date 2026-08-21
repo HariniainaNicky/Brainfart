@@ -35,6 +35,10 @@ model User {
   banned        Boolean?
   banReason     String?
   banExpires    String?
+  streak        Int       @default(0)
+  longestStreak Int       @default(0)
+  lastDailyAt   DateTime?
+  dailyCompletions DailyCompletion[]
 
   openedRooms  Room[] @relation("OpenedRooms")
   wonRooms     Room[] @relation("Winner")
@@ -103,6 +107,19 @@ model Type {
   name          String     @unique
   apiCategoryId Int?       @unique
   questions     Question[]
+}
+
+model DailyCompletion {
+  id         String   @id @default(cuid())
+  userId     String
+  date       String
+  questionId String
+  correct    Boolean
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_completion")
 }
 
 model Session {
