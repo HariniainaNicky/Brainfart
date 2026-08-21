@@ -12,12 +12,13 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/shadcn-component/sheet";
-import { Bell, Menu, User, Settings, LogOut } from "lucide-react";
+import { Bell, Menu, User, Settings, LogOut, ChevronDown, Gamepad2, Brain, Zap, Puzzle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./shadcn-component/spinner";
 import { Badge } from "@/components/ui/shadcn-component/badge";
 import { Session } from "@/types/better-auth";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,11 +43,15 @@ export const Header = (props: HeaderPropsType) => {
     const router = useRouter();
 
     useEffect(() => {
-        if (userData) {
-            const notifications = userData.notifications;
-            const unseenNotifications = notifications.filter((notification) => !notification.seen);
+        if (userData?.notifications) {
+            const unseenNotifications = userData.notifications.filter(
+                (notification) => !notification.isDeleted && !notification.seen,
+            );
             setContainsNotificationUnseen(unseenNotifications.length > 0);
             setUnseenNotificationsNumber(unseenNotifications.length);
+        } else {
+            setContainsNotificationUnseen(false);
+            setUnseenNotificationsNumber(0);
         }
     }, [userData])
     const handleLogOut = async () => {
@@ -80,10 +85,40 @@ export const Header = (props: HeaderPropsType) => {
                 <ModeToggle />
             </div>
 
-            <ul className="hidden sm:flex flex-row items-center gap-3 p-1">
+            <ul className="hidden sm:flex flex-row items-center gap-2 p-1">
                 <Button variant="ghost" onClick={() => router.push("/room")}>
                     Rooms
                 </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="gap-1">
+                            Games <ChevronDown className="size-3.5 opacity-60" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                        <DropdownMenuLabel>Game types</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => router.push("/single-player")} className="cursor-pointer">
+                            <Brain className="size-4" /> Trivia <span className="ml-auto text-xs text-muted-foreground">Live</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled className="opacity-60">
+                            <Puzzle className="size-4" /> Memory <span className="ml-auto text-xs">Soon</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled className="opacity-60">
+                            <Zap className="size-4" /> Speed Run <span className="ml-auto text-xs">Soon</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled className="opacity-60">
+                            <Gamepad2 className="size-4" /> Puzzle <span className="ml-auto text-xs">Soon</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            className="cursor-pointer text-muted-foreground"
+                            onClick={() => toast("More games coming in the next release!", { icon: "🚀" })}
+                        >
+                            Waiting for next release
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Button variant="ghost" onClick={handleGoToLeaderboard}>
                     Leaderboard
                 </Button>
@@ -111,6 +146,21 @@ export const Header = (props: HeaderPropsType) => {
                             >
                                 Rooms
                             </Button>
+                            <div className="flex flex-col gap-2 border border-border rounded-lg p-3">
+                                <span className="text-xs font-medium text-muted-foreground px-2">Games</span>
+                                <Button variant="ghost" size="sm" onClick={() => router.push("/single-player")} className="justify-start gap-2">
+                                    <Brain className="size-4" /> Trivia
+                                </Button>
+                                <Button variant="ghost" size="sm" disabled className="justify-start gap-2 opacity-60">
+                                    <Puzzle className="size-4" /> Memory — Soon
+                                </Button>
+                                <Button variant="ghost" size="sm" disabled className="justify-start gap-2 opacity-60">
+                                    <Zap className="size-4" /> Speed Run — Soon
+                                </Button>
+                                <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground" onClick={() => toast("More games coming in the next release!", { icon: "🚀" })}>
+                                    More — next release
+                                </Button>
+                            </div>
                             <Button
                                 variant="ghost"
                                 onClick={handleGoToLeaderboard}

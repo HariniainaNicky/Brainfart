@@ -47,6 +47,9 @@ export const GET = async (
         rank: true,
         highestScore: true,
         createdAt: true,
+        joinedRooms: { select: { id: true, title: true, startDate: true, closed: true } },
+        wonRooms: { select: { id: true, title: true } },
+        openedRooms: { select: { id: true, title: true, startDate: true } },
       },
     });
 
