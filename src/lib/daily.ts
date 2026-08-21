@@ -1,6 +1,22 @@
 import { prisma } from "@/lib/prisma";
 
-export const getTodayString = () => new Date().toISOString().slice(0, 10);
+export const getTodayString = (timeZone?: string) => {
+  if (timeZone) {
+    return new Date().toLocaleDateString("en-CA", { timeZone });
+  }
+  return new Date().toISOString().slice(0, 10);
+};
+
+const getTodayForRequest = (todayParam?: string | null) => {
+  if (todayParam && /^\d{4}-\d{2}-\d{2}$/.test(todayParam)) return todayParam;
+  return getTodayString();
+};
+
+const getYesterdayString = (today: string) => {
+  const d = new Date(today + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+};
 
 const hashString = (str: string) => {
   let hash = 0;
@@ -19,8 +35,8 @@ const shuffle = <T>(arr: T[]): T[] => {
   return a;
 };
 
-export const getDailyQuestion = async () => {
-  const today = getTodayString();
+export const getDailyQuestion = async (todayParam?: string | null) => {
+  const today = getTodayForRequest(todayParam);
   const count = await prisma.question.count({ where: { isValidated: true } });
   if (count === 0) return null;
   const offset = hashString(today) % count;
@@ -50,17 +66,16 @@ export const getDailyQuestion = async () => {
   return question;
 };
 
-export const getUserDailyState = async (userId: string) => {
+export const getUserDailyState = async (userId: string, todayParam?: string | null) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { streak: true, longestStreak: true, lastDailyAt: true },
   });
   if (!user) return null;
-  const today = getTodayString();
+  const today = getTodayForRequest(todayParam);
   const lastDate = user.lastDailyAt ? new Date(user.lastDailyAt).toISOString().slice(0, 10) : null;
   const completedToday = lastDate === today;
-  // Check if streak is still valid: if lastDailyAt is yesterday, streak is intact, if older than yesterday, streak should be 0 but we keep stored value until next completion
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = getYesterdayString(today);
   const streakValid = lastDate === today || lastDate === yesterday;
   const displayStreak = streakValid ? user.streak : 0;
   return {
@@ -71,13 +86,13 @@ export const getUserDailyState = async (userId: string) => {
   };
 };
 
-export const completeDaily = async (userId: string, correct: boolean, questionId: string) => {
-  const today = getTodayString();
+export const completeDaily = async (userId: string, correct: boolean, questionId: string, todayParam?: string | null) => {
+  const today = getTodayForRequest(todayParam);
   const existing = await prisma.dailyCompletion.findUnique({
     where: { userId_date: { userId, date: today } },
   });
   if (existing) {
-    const state = await getUserDailyState(userId);
+    const state = await getUserDailyState(userId, today);
     return { alreadyCompleted: true, ...state, correct: existing.correct };
   }
 
@@ -86,7 +101,7 @@ export const completeDaily = async (userId: string, correct: boolean, questionId
   });
 
   if (!correct) {
-    const state = await getUserDailyState(userId);
+    const state = await getUserDailyState(userId, today);
     return { alreadyCompleted: false, ...state, correct: false };
   }
 
@@ -97,7 +112,7 @@ export const completeDaily = async (userId: string, correct: boolean, questionId
   if (!user) throw new Error("User not found");
 
   const lastDate = user.lastDailyAt ? new Date(user.lastDailyAt).toISOString().slice(0, 10) : null;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = getYesterdayString(today);
 
   let newStreak = 1;
   if (lastDate === yesterday) newStreak = user.streak + 1;

@@ -3,9 +3,11 @@ import { getDailyQuestion, getUserDailyState } from "@/lib/daily";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
-    const question = await getDailyQuestion();
+    const url = new URL(req.url);
+    const todayParam = url.searchParams.get("today");
+    const question = await getDailyQuestion(todayParam);
     if (!question) return NextResponse.json({ message: "No question available" }, { status: 404 });
 
     const session = await auth.api.getSession({ headers: await headers() });
@@ -13,7 +15,7 @@ export const GET = async () => {
       return NextResponse.json({ data: { question, streak: 0, completedToday: false } }, { status: 200 });
     }
 
-    const state = await getUserDailyState(session.user.id);
+    const state = await getUserDailyState(session.user.id, todayParam);
     return NextResponse.json(
       { data: { question, streak: state?.streak ?? 0, longestStreak: state?.longestStreak ?? 0, completedToday: state?.completedToday ?? false } },
       { status: 200 },

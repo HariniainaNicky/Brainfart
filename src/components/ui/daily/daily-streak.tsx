@@ -32,7 +32,8 @@ export const DailyStreak = () => {
 
   const fetchDaily = async () => {
     try {
-      const res = await fetch("/api/daily");
+      const today = new Date().toLocaleDateString("en-CA");
+      const res = await fetch(`/api/daily?today=${today}`);
       const json = await res.json();
       if (json.data) {
         setDailyData(json.data);
@@ -64,10 +65,11 @@ export const DailyStreak = () => {
     if (!selected || !dailyData) return;
     setSubmitting(true);
     try {
+      const today = new Date().toLocaleDateString("en-CA");
       const res = await fetch("/api/daily/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answer: selected }),
+        body: JSON.stringify({ answer: selected, today }),
       });
       const json = await res.json();
       if (!res.ok) {
