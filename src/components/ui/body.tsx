@@ -5,7 +5,7 @@ import { CarouselDemo } from "./carousel-template";
 import { Separator } from "./shadcn-component/separator";
 import { UserHistory } from "./user-history";
 import { useRouter } from "next/navigation";
-import { Gamepad2, Users, Trophy, Sparkles } from "lucide-react";
+import { Gamepad2, Users, Trophy, ArrowRight } from "lucide-react";
 import { TOPIC_ICONS, TOPIC_LABELS } from "@/lib/topics";
 import { useEffect } from "react";
 import { useTriviaCategories } from "@/stores/useTriviaCategories";
@@ -111,7 +111,7 @@ export const Body = (props: BodyPropsType) => {
                         onClick={handleStart}
                         className="text-base gap-2"
                     >
-                        <Sparkles className="size-5" />
+                        <ArrowRight className="size-5" />
                         {props.logged ? "Create room" : "Get started"}
                     </Button>
                 </motion.div>

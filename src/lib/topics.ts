@@ -60,7 +60,6 @@ import {
   Car,
   BookMarked,
   Bot,
-  Sparkles,
   Rabbit,
   HelpCircle,
 } from "lucide-react";
@@ -88,7 +87,7 @@ export const TOPIC_ICONS: Record<string, LucideIcon> = {
   vehicles: Car,
   "entertainment-comics": BookMarked,
   "science-gadgets": Bot,
-  "entertainment-japanese-anime-manga": Sparkles,
+  "entertainment-japanese-anime-manga": Tv,
   "entertainment-cartoon-animations": Rabbit,
 };
 

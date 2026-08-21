@@ -114,7 +114,7 @@ export const Header = (props: HeaderPropsType) => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             className="cursor-pointer text-muted-foreground"
-                            onClick={() => toast("More games coming in the next release!", { icon: "🚀" })}
+                            onClick={() => toast("More games coming in the next release!")}
                         >
                             Waiting for next release
                         </DropdownMenuItem>
@@ -153,13 +153,13 @@ export const Header = (props: HeaderPropsType) => {
                                     <Brain className="size-4" /> Trivia
                                 </Button>
                                 <Button variant="ghost" size="sm" disabled className="justify-start gap-2 opacity-60">
-                                    <Puzzle className="size-4" /> Memory — Soon
+                                    <Puzzle className="size-4" /> Memory Soon
                                 </Button>
                                 <Button variant="ghost" size="sm" onClick={() => router.push("/single-player?mode=speedrun")} className="justify-start gap-2">
                                     <Zap className="size-4" /> Speed Run
                                 </Button>
-                                <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground" onClick={() => toast("More games coming in the next release!", { icon: "🚀" })}>
-                                    More — next release
+                                <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground" onClick={() => toast("More games coming in the next release!")}>
+                                    More next release
                                 </Button>
                             </div>
                             <Button

@@ -99,7 +99,7 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
   const formattedRank = formatRank(user.rank ?? 0);
 
   const statCards = [
-    { label: "Rank", value: user.rank ? formattedRank : "—", icon: Trophy },
+    { label: "Rank", value: user.rank ? formattedRank : "-", icon: Trophy },
     { label: "Score", value: user.highestScore ? `${user.highestScore} pts` : "0 pts", icon: Star },
     { label: "Member since", value: `${joinDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`, icon: Calendar },
     { label: "Status", value: user.rank !== null && user.rank <= 5 ? "Top Player" : "Player", icon: Award },
@@ -170,7 +170,7 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
             </div>
           </div>
           <div className="rounded-lg bg-muted p-3 text-xs text-muted-foreground flex items-center gap-2">
-            <Clock className="size-3.5 shrink-0" /> Solo games are practice runs — best score is tracked globally.
+            <Clock className="size-3.5 shrink-0" /> Solo games are practice runs. Best score is tracked globally.
           </div>
         </div>
 

@@ -47,7 +47,7 @@ export const ContactBodyContent = () => {
           <p className="text-sm text-muted-foreground mt-1">BrainFart Developer</p>
         </div>
         <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-          Built BrainFart with lots of coffee, late nights, and a passion for trivia. If you have feedback, ideas, or just want to say hi — I&apos;d love to hear from you.
+          Built BrainFart with lots of coffee, late nights, and a passion for trivia. If you have feedback, ideas, or just want to say hi, I would love to hear from you.
         </p>
       </div>
 
