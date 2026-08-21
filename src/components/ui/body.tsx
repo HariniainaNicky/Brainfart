@@ -54,6 +54,10 @@ export const Body = (props: BodyPropsType) => {
     };
 
     const handlePlaySingleMode = () => {
+        if (!props.logged) {
+            router.push("/auth/sign-in");
+            return;
+        }
         router.push("/single-player");
     };
 
@@ -90,17 +94,19 @@ export const Body = (props: BodyPropsType) => {
                     transition={{ delay: 0.35, duration: 0.5 }}
                     className="flex flex-col sm:flex-row gap-3 mt-2"
                 >
+                    {props.logged && (
+                        <Button
+                            variant="default"
+                            size="lg"
+                            onClick={handlePlaySingleMode}
+                            className="text-base gap-2"
+                        >
+                            <Gamepad2 className="size-5" />
+                            Single player mode
+                        </Button>
+                    )}
                     <Button
-                        variant="default"
-                        size="lg"
-                        onClick={handlePlaySingleMode}
-                        className="text-base gap-2"
-                    >
-                        <Gamepad2 className="size-5" />
-                        Single player mode
-                    </Button>
-                    <Button
-                        variant="secondary"
+                        variant={props.logged ? "secondary" : "default"}
                         size="lg"
                         onClick={handleStart}
                         className="text-base gap-2"
@@ -111,39 +117,41 @@ export const Body = (props: BodyPropsType) => {
                 </motion.div>
             </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.45, duration: 0.5 }}
-                className="flex flex-wrap justify-center gap-2 max-w-3xl"
-            >
-                <p className="w-full text-center text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                    20+ topics
-                </p>
-                {Object.entries(TOPIC_LABELS)
-                    .slice(0, 12)
-                    .map(([slug, label]) => {
-                        const Icon = TOPIC_ICONS[slug];
-                        return (
-                            <button
-                                key={slug}
-                                type="button"
-                                onClick={() => router.push("/single-player")}
-                                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium cursor-pointer hover:border-primary/40 hover:bg-accent transition-colors duration-200"
-                            >
-                                {Icon ? <Icon className="size-3.5 text-muted-foreground" /> : null}
-                                {label}
-                            </button>
-                        );
-                    })}
-                <button
-                    type="button"
-                    onClick={() => router.push("/single-player")}
-                    className="inline-flex items-center rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground cursor-pointer hover:border-primary/40 hover:text-foreground transition-colors duration-200"
+            {props.logged && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.45, duration: 0.5 }}
+                    className="flex flex-wrap justify-center gap-2 max-w-3xl"
                 >
-                    + more
-                </button>
-            </motion.div>
+                    <p className="w-full text-center text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                        20+ topics
+                    </p>
+                    {Object.entries(TOPIC_LABELS)
+                        .slice(0, 12)
+                        .map(([slug, label]) => {
+                            const Icon = TOPIC_ICONS[slug];
+                            return (
+                                <button
+                                    key={slug}
+                                    type="button"
+                                    onClick={() => router.push("/single-player")}
+                                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium cursor-pointer hover:border-primary/40 hover:bg-accent transition-colors duration-200"
+                                >
+                                    {Icon ? <Icon className="size-3.5 text-muted-foreground" /> : null}
+                                    {label}
+                                </button>
+                            );
+                        })}
+                    <button
+                        type="button"
+                        onClick={() => router.push("/single-player")}
+                        className="inline-flex items-center rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground cursor-pointer hover:border-primary/40 hover:text-foreground transition-colors duration-200"
+                    >
+                        + more
+                    </button>
+                </motion.div>
+            )}
 
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
