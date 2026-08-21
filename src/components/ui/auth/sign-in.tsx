@@ -14,7 +14,7 @@ import { useState } from "react";
 const ButtonMotion = motion.create(Button);
 
 type FormType = {
-  email: string;
+  login: string;
   password: string;
 };
 
@@ -25,40 +25,51 @@ export const SignIn = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPass, setShowPass] = useState(false);
   const handleClick = async (data: FormType) => {
-    const { email, password } = data;
+    const { login, password } = data;
+    const isEmail = login.includes("@");
     let loadId: string | undefined;
-    await authClient.signIn.email(
-      {
-        email: email,
-        password: password,
+    const callbacks = {
+      onSuccess: () => {
+        toast.success("Welcome back.", { id: loadId });
+        setLoading(false);
+        router.push("/");
       },
-      {
-        onSuccess: () => {
-          toast.success("Welcome back.", { id: loadId });
-          setLoading(false);
-          router.push("/");
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message, { id: loadId });
-
-          setLoading(false);
-        },
-        onRequest: () => {
-          loadId = toast.loading("Wait please...");
-          setLoading(true);
-        },
+      onError: (ctx: { error: { message: string } }) => {
+        toast.error(ctx.error.message, { id: loadId });
+        setLoading(false);
       },
-    );
+      onRequest: () => {
+        loadId = toast.loading("Wait please...");
+        setLoading(true);
+      },
+    };
+    if (isEmail) {
+      await authClient.signIn.email(
+        {
+          email: login,
+          password: password,
+        },
+        callbacks as never,
+      );
+    } else {
+      await (authClient.signIn as unknown as { username: (opts: { username: string; password: string }, opts2: unknown) => Promise<void> }).username(
+        {
+          username: login,
+          password,
+        },
+        callbacks as never,
+      );
+    }
   };
   return (
     <form className="flex flex-col gap-5 w-full">
       <div className="flex flex-col gap-2 w-full">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="login">Email or username</Label>
         <Input
-          {...register("email")}
-          type="email"
-          id="email"
-          placeholder="user@gmail.com"
+          {...register("login")}
+          type="text"
+          id="login"
+          placeholder="user@gmail.com or username"
         />
       </div>
       <div className="flex flex-col gap-2 w-full">
@@ -82,7 +93,7 @@ export const SignIn = () => {
         Sign in
       </ButtonMotion>
       <Link href="/auth/sign-up" className="text-sm text-center hover:underline">
-        Don't have an account?
+        Don&apos;t have an account?
       </Link>
     </form>
   );
