@@ -1,7 +1,7 @@
 "use client"
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions, updateUserScore } from "@/utils/func";
 import { topicIcon, topicLabel } from "@/lib/topics";
-import { createElement, useEffect } from "react";
+import { createElement, useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
@@ -12,7 +12,6 @@ import { Checkbox } from "../shadcn-component/checkbox";
 import { Button } from "../shadcn-component/button";
 import { toast } from "react-hot-toast";
 import { Question } from "@/types/db";
-import { useState } from "react";
 import { AddAndRemoveButton } from "../button/add-and-remove-button";
 import { motion, AnimatePresence } from "motion/react";
 import { authClient } from "@/lib/auth-client";
@@ -33,6 +32,9 @@ export const SinglePlayerMode = () => {
   const [startGame, setStartGame] = useState(false);
   const [typeId, setTypeId] = useState<string>("null");
   const [source, setSource] = useState<"brainfart" | "trivia">("trivia");
+  const [isSpeedRun, setIsSpeedRun] = useState(false);
+  const [timeLimit, setTimeLimit] = useState(120);
+  const [timeLeft, setTimeLeft] = useState(120);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [numberOfQuestion, setNumberOfQuestion] = useState(10);
@@ -42,6 +44,12 @@ export const SinglePlayerMode = () => {
   const [randomAnswer, setRandomAnswer] = useState<string[]>([]);
   const [currentScore, setCurrentScore] = useState(0);
   const [myAnswers, setMyAnswers] = useState<MyAnswersVSTheAnswers>({ myAnswers: [], theAnswers: [], questions: [] });
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "speedrun") {
+      setIsSpeedRun(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (questions.length === 0) return;
@@ -68,14 +76,46 @@ export const SinglePlayerMode = () => {
     fetchChoices();
   }, [currentQuestionCount, questions]);
 
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (!isSpeedRun || !startGame || isGameFinished) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [isSpeedRun, startGame, isGameFinished]);
+
+  useEffect(() => {
+    if (isSpeedRun && startGame && timeLeft === 0 && !isGameFinished) {
+      toast.success(`Time is up! You answered ${myAnswers.myAnswers.length} questions`);
+      updateUserScore(currentScore, session?.user.id || "");
+      setIsGameFinished(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  }, [timeLeft, isSpeedRun, startGame, isGameFinished, currentScore, myAnswers.myAnswers.length, session?.user.id]);
+
   const handleStart = async () => {
     setQuestionsLoading(true);
-    const qs = await getQuestions(numberOfQuestion, typeId === "null" ? null : typeId);
+    const count = isSpeedRun ? 30 : numberOfQuestion;
+    const qs = await getQuestions(count, typeId === "null" ? null : typeId);
+    if (qs.length === 0) {
+      toast.error("No questions available for this category");
+      setQuestionsLoading(false);
+      return;
+    }
     setQuestions(qs);
     setMyAnswers({ myAnswers: [], theAnswers: [], questions: qs.map((q: Question) => q.question) });
     setCurrentQuestionCount(0);
     setCurrentScore(0);
     setIsGameFinished(false);
+    if (isSpeedRun) setTimeLeft(timeLimit);
     setQuestionsLoading(false);
     setStartGame(true);
   };
@@ -83,7 +123,8 @@ export const SinglePlayerMode = () => {
   const question = questions[currentQuestionCount];
 
   const handleSubmit = async () => {
-    if (checkedAnswer.length === 1 && checkedAnswer[0] === question.Answer) {
+    const isCorrect = checkedAnswer.length === 1 && checkedAnswer[0] === question.Answer;
+    if (isCorrect) {
       setCurrentScore((prev) => prev + question.Score);
       toast.success("Correct answer!");
     } else {
@@ -91,7 +132,6 @@ export const SinglePlayerMode = () => {
     }
 
     let myCurrentAnswers: string = "NO ANSWER";
-
     if (checkedAnswer.length !== 0) {
       myCurrentAnswers = checkedAnswer[0];
     }
@@ -101,18 +141,41 @@ export const SinglePlayerMode = () => {
         theAnswers: [...prev.theAnswers, question.Answer], questions: prev.questions })
     );
 
+    if (isSpeedRun) {
+      const nextIndex = currentQuestionCount + 1;
+      if (nextIndex < questions.length) {
+        setCurrentQuestionCount(nextIndex);
+      } else {
+        const more = await getQuestions(20, typeId === "null" ? null : typeId);
+        if (more.length > 0) {
+          setQuestions((prev) => [...prev, ...more]);
+          setMyAnswers((prev) => ({ ...prev, questions: [...prev.questions, ...more.map((q: Question) => q.question)] }));
+          setCurrentQuestionCount(nextIndex);
+        } else {
+          const finalScore = currentScore + (isCorrect ? question.Score : 0);
+          toast.success(`You answered ${myAnswers.myAnswers.length + 1} questions`);
+          await updateUserScore(finalScore, session?.user.id || "");
+          setIsGameFinished(true);
+        }
+      }
+      return;
+    }
+
     if (currentQuestionCount < questions.length - 1) {
       setCurrentQuestionCount((prev) => prev + 1);
     } else {
-      toast.success(`Thanks for playing! Your score is ${currentScore}pts.`);
-      await updateUserScore(currentScore, session?.user.id || "");
+      const finalScore = currentScore + (isCorrect ? question.Score : 0);
+      toast.success(`Thanks for playing! Your score is ${finalScore}pts.`);
+      await updateUserScore(finalScore, session?.user.id || "");
       setIsGameFinished(true);
     }
   };
 
   const handleBack = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setIsGameFinished(false);
     setStartGame(false);
+    setTimeLeft(timeLimit);
   };
 
   return (
@@ -122,6 +185,32 @@ export const SinglePlayerMode = () => {
       {!startGame && !questionsLoading && (
         <div className="w-full rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col items-center gap-4">
+            <div className="flex w-full rounded-lg border bg-muted p-1 gap-1">
+              <button
+                type="button"
+                onClick={() => setIsSpeedRun(false)}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+                  !isSpeedRun
+                    ? "bg-card shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Classic
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSpeedRun(true)}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+                  isSpeedRun
+                    ? "bg-card shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Speed Run
+              </button>
+            </div>
             <div className="flex w-full rounded-lg border bg-muted p-1 gap-1">
               <button
                 type="button"
@@ -162,13 +251,36 @@ export const SinglePlayerMode = () => {
                 onSelect={setTypeId}
               />
             )}
-            <p className="text-sm text-muted-foreground">Number of questions</p>
-            <div className="flex flex-row items-center gap-4">
-              <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>
-              <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
-            </div>
+            {isSpeedRun ? (
+              <>
+                <p className="text-sm text-muted-foreground">Time limit</p>
+                <div className="flex flex-row gap-2">
+                  {[60, 120, 240].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTimeLimit(t)}
+                      className={cn(
+                        "rounded-lg border px-4 py-2 text-sm font-medium cursor-pointer transition-colors",
+                        timeLimit === t ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/40",
+                      )}
+                    >
+                      {t / 60} min
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">Number of questions</p>
+                <div className="flex flex-row items-center gap-4">
+                  <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>
+                  <AddAndRemoveButton setNumberOfQuestion={setNumberOfQuestion} />
+                </div>
+              </>
+            )}
             <Button onClick={handleStart}>
-              Start
+              Start {isSpeedRun ? `Speed Run` : ""}
             </Button>
           </div>
         </div>
@@ -183,23 +295,49 @@ export const SinglePlayerMode = () => {
       {startGame && !questionsLoading && !isGameFinished && question && (
         <div className="flex flex-col gap-4 w-full">
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-primary"
-                layout
-                transition={{ duration: 0.3 }}
-                style={{ width: `${((currentQuestionCount + 1) / questions.length) * 100}%` }}
-              />
-            </div>
-            <motion.span
-              key={currentScore}
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 0.3 }}
-              className="text-sm font-bold shrink-0 tabular-nums"
-            >
-              {currentScore}pts
-            </motion.span>
+            {isSpeedRun ? (
+              <>
+                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-orange-500"
+                    style={{ width: `${(timeLeft / timeLimit) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm font-bold tabular-nums shrink-0">
+                  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                </span>
+                <span className="text-xs text-muted-foreground shrink-0">{myAnswers.myAnswers.length} answered</span>
+                <motion.span
+                  key={currentScore}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm font-bold shrink-0 tabular-nums"
+                >
+                  {currentScore}pts
+                </motion.span>
+              </>
+            ) : (
+              <>
+                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-primary"
+                    layout
+                    transition={{ duration: 0.3 }}
+                    style={{ width: `${((currentQuestionCount + 1) / questions.length) * 100}%` }}
+                  />
+                </div>
+                <motion.span
+                  key={currentScore}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm font-bold shrink-0 tabular-nums"
+                >
+                  {currentScore}pts
+                </motion.span>
+              </>
+            )}
           </div>
 
           <form

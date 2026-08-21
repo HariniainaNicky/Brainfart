@@ -105,8 +105,8 @@ export const Header = (props: HeaderPropsType) => {
                         <DropdownMenuItem disabled className="opacity-60">
                             <Puzzle className="size-4" /> Memory <span className="ml-auto text-xs">Soon</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem disabled className="opacity-60">
-                            <Zap className="size-4" /> Speed Run <span className="ml-auto text-xs">Soon</span>
+                        <DropdownMenuItem onClick={() => router.push("/single-player?mode=speedrun")} className="cursor-pointer">
+                            <Zap className="size-4" /> Speed Run <span className="ml-auto text-xs text-muted-foreground">Live</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem disabled className="opacity-60">
                             <Gamepad2 className="size-4" /> Puzzle <span className="ml-auto text-xs">Soon</span>
@@ -155,8 +155,8 @@ export const Header = (props: HeaderPropsType) => {
                                 <Button variant="ghost" size="sm" disabled className="justify-start gap-2 opacity-60">
                                     <Puzzle className="size-4" /> Memory — Soon
                                 </Button>
-                                <Button variant="ghost" size="sm" disabled className="justify-start gap-2 opacity-60">
-                                    <Zap className="size-4" /> Speed Run — Soon
+                                <Button variant="ghost" size="sm" onClick={() => router.push("/single-player?mode=speedrun")} className="justify-start gap-2">
+                                    <Zap className="size-4" /> Speed Run
                                 </Button>
                                 <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground" onClick={() => toast("More games coming in the next release!", { icon: "🚀" })}>
                                     More — next release
