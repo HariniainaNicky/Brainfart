@@ -98,7 +98,7 @@ export const DailyStreak = () => {
         variant="ghost"
         size="sm"
         onClick={handleClick}
-        className="gap-1.5 h-8 px-2.5 cursor-pointer"
+        className="gap-1.5 h-9 px-3 cursor-pointer"
         title={completedToday ? "Daily completed" : "Play daily trivia"}
       >
         <Flame className={`size-4 ${completedToday ? "text-orange-500 fill-orange-500" : "text-muted-foreground"}`} />

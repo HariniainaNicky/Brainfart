@@ -20,8 +20,8 @@ export const UserTable = ({ users, handleRefresh }: UserTablePropsType) => {
   const router = useRouter();
 
   return (
-    <div className="max-w-full overflow-x-hidden border rounded-lg bg-card">
-      <Table className="min-w-[400px] md:min-w-[600px] lg:min-w-[800px]">
+    <div className="w-full overflow-x-auto border rounded-lg bg-card">
+      <Table className="min-w-[500px]">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[5%] text-left">Rank</TableHead>
@@ -36,13 +36,13 @@ export const UserTable = ({ users, handleRefresh }: UserTablePropsType) => {
               onClick={() => router.push(`/user/${user.id}`)}
             >
               <TableCell>{user.rank}</TableCell>
-              <TableCell className="flex flex-row gap-2 items-center">
+              <TableCell className="flex flex-row gap-2 items-center max-w-[180px] sm:max-w-[260px]">
                 <Avatar
                   src={user.image || ""}
                   alt={user.username || ""}
                   size={20}
                 />
-                <span className="text-sm">{user.username || user.email}</span>
+                <span className="text-sm truncate">{user.username || user.email}</span>
               </TableCell>
               <TableCell>{user.highestScore}</TableCell>
             </TableRow>

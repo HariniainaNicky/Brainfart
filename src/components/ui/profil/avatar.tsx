@@ -11,15 +11,16 @@ type AvatarPropsType = {
   size?: number;
   onClick?: () => void;
   loading?: boolean;
+  className?: string;
 };
 
-export const Avatar = ({ loading = false, src, alt = "avatar", size = 48, onClick }: AvatarPropsType) => {
+export const Avatar = ({ loading = false, src, alt = "avatar", size = 48, onClick, className }: AvatarPropsType) => {
   const letter = alt.charAt(0).toUpperCase();
 
   return (
     <Button
       variant="secondary"
-      className="overflow-hidden rounded-full flex items-center justify-center border font-bold p-0 hover:cursor-pointer"
+      className={`overflow-hidden rounded-full flex items-center justify-center border font-bold p-0 hover:cursor-pointer ${className ?? ""}`}
       style={{ width: size, height: size }}
       onClick={onClick}
     >

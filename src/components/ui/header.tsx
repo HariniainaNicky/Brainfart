@@ -81,12 +81,12 @@ export const Header = (props: HeaderPropsType) => {
     };
 
     return (
-        <div className="flex flex-row justify-between items-center md:m-4 rounded-3xl border border-transparent hover:border-border transition-colors duration-200">
-            <div className="m-5 sm:flex hidden">
+        <div className="sticky top-0 z-40 flex flex-row justify-between items-center w-full max-w-7xl mx-auto px-4 py-2 md:m-4 md:w-[calc(100%-2rem)] rounded-3xl border border-transparent hover:border-border transition-colors duration-200 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="m-2 sm:m-5 hidden md:flex">
                 <ModeToggle />
             </div>
 
-            <ul className="hidden sm:flex flex-row items-center gap-2 p-1">
+            <ul className="hidden md:flex flex-row items-center gap-2 p-1">
                 <Button variant="ghost" onClick={() => router.push("/room")}>
                     Rooms
                 </Button>
@@ -128,19 +128,20 @@ export const Header = (props: HeaderPropsType) => {
                 </Button>
             </ul>
 
-            <div className="sm:hidden flex flex-row items-center m-3">
+            <div className="md:hidden flex flex-row items-center m-2">
                 <Sheet>
                     <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Menu className="h-6 w-6" />
+                        <Button variant="ghost" size="icon" className="size-10">
+                            <Menu className="size-5" />
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="right">
-                        <SheetHeader>
+                    <SheetContent side="right" className="w-[85vw] max-w-[320px] flex flex-col p-0">
+                        <SheetHeader className="p-4 pb-2">
                             <SheetTitle>BrainFart</SheetTitle>
                             <SheetDescription>v0.1.0</SheetDescription>
                         </SheetHeader>
-                        <ul className="flex flex-col gap-4 mt-8">
+                        <div className="flex-1 overflow-y-auto p-4">
+                        <ul className="flex flex-col gap-3">
                             <Button
                                 variant="ghost"
                                 onClick={() => router.push("/room")}
@@ -175,8 +176,9 @@ export const Header = (props: HeaderPropsType) => {
                                 Contact
                             </Button>
                         </ul>
-                        <SheetFooter className="flex flex-row justify-end">
-                            <div className="m-5 ">
+                        </div>
+                        <SheetFooter className="p-4 border-t flex-col gap-0">
+                            <div className="w-full flex justify-center">
                                 <ModeToggle />
                             </div>
                         </SheetFooter>
@@ -187,7 +189,7 @@ export const Header = (props: HeaderPropsType) => {
             {props.logged ? (
                 <div className="flex flex-row items-center p-2 gap-1 sm:gap-2">
                     <DailyStreak />
-                    <Button variant="ghost" size="icon" className="relative" onClick={handleGoTonotification}>
+                    <Button variant="ghost" size="icon" className="relative size-10" onClick={handleGoTonotification}>
                         <Bell className="size-5" />
                         {containsNotificationUnseen ? (
                             <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center">
@@ -197,13 +199,12 @@ export const Header = (props: HeaderPropsType) => {
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer">
-                                <Avatar
-                                    src={props.session?.user?.image || ""}
-                                    alt={props.session?.user?.username || ""}
-                                    size={36}
-                                />
-                            </button>
+                            <Avatar
+                                src={props.session?.user?.image || ""}
+                                alt={props.session?.user?.username || ""}
+                                size={40}
+                                className="cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
+                            />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
                             <DropdownMenuLabel>

@@ -54,9 +54,9 @@ export const LeaderboardBody = () => {
 
   if (isPending || loading) {
     return (
-      <div className="flex flex-col gap-5 items-center justify-center m-4">
+      <div className="flex flex-col gap-5 items-center justify-center px-4 py-6 w-full max-w-2xl mx-auto">
         <Skeleton className="h-10 w-48" />
-        <div className="w-full max-w-2xl">
+        <div className="w-full">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-16 w-full mb-2" />
           ))}
@@ -65,21 +65,25 @@ export const LeaderboardBody = () => {
     );
   }
 
-  return <div className="flex flex-col gap-5 items-center justify-center m-4 w-full">
-    <Button variant="secondary" onClick={handleRefresh} disabled={loading}>Refresh leaderboard</Button>
+  return <div className="flex flex-col gap-5 items-center justify-center px-4 py-6 w-full max-w-2xl mx-auto">
+    <Button variant="secondary" onClick={handleRefresh} disabled={loading} className="w-full sm:w-auto">Refresh leaderboard</Button>
     {users.length === 0 ? (
       <p className="text-sm text-muted-foreground py-8">No users yet.</p>
     ) : (
       <>
-        <UserTable users={paginatedUsers} handleRefresh={handleRefresh}/>
-        <div className="flex flex-row justify-end gap-2 items-center w-full max-w-2xl">
+        <div className="w-full overflow-hidden">
+          <UserTable users={paginatedUsers} handleRefresh={handleRefresh}/>
+        </div>
+        <div className="flex flex-row justify-between sm:justify-end gap-2 items-center w-full flex-wrap">
           <span className="text-sm text-muted-foreground">{page}/{maxPage}</span>
-          <Button variant="outline" size="icon" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-            <ArrowLeft className="size-4" />
-          </Button>
-          <Button variant="outline" size="icon" onClick={() => setPage((p) => Math.min(maxPage, p + 1))} disabled={page === maxPage}>
-            <ArrowRight className="size-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" className="size-9" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+              <ArrowLeft className="size-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="size-9" onClick={() => setPage((p) => Math.min(maxPage, p + 1))} disabled={page === maxPage}>
+              <ArrowRight className="size-4" />
+            </Button>
+          </div>
         </div>
       </>
     )}
