@@ -63,8 +63,8 @@ export const SignUp = () => {
       },
       {
         onSuccess: () => {
-          toast.success("Welcome to Shirugame.", { id: loadId });
-          router.push("/auth/starter")
+          toast.success("Check your email to verify your account.", { id: loadId });
+          router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)
           setLoading(false);
         },
         onError: (ctx) => {

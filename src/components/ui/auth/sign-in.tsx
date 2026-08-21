@@ -35,7 +35,12 @@ export const SignIn = () => {
         router.push("/");
       },
       onError: (ctx: { error: { message: string } }) => {
-        toast.error(ctx.error.message, { id: loadId });
+        const msg = ctx.error.message || "";
+        toast.error(msg, { id: loadId });
+        if (msg.toLowerCase().includes("not verified") || msg.toLowerCase().includes("verify your email")) {
+          const email = isEmail ? login : "";
+          if (email) router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+        }
         setLoading(false);
       },
       onRequest: () => {

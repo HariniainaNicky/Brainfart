@@ -54,6 +54,7 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 20,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }: { user: { email: string; name: string }; url: string }) => {
       const html = emailLayout(`
         <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.3px; color: #18181b;">Reset Your Password</h2>
@@ -85,6 +86,9 @@ export const auth = betterAuth({
     admin()
   ],
   emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    expiresIn: 60 * 30,
     sendVerificationEmail: async ({ user, url }) => {
       const html = emailLayout(`
         <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.3px; color: #18181b;">Verify Your Email</h2>
