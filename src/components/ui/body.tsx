@@ -1,11 +1,9 @@
 "use client";
 import { motion } from "motion/react";
 import { Button } from "./shadcn-component/button";
-import { CarouselDemo } from "./carousel-template";
 import { Separator } from "./shadcn-component/separator";
-import { UserHistory } from "./user-history";
 import { useRouter } from "next/navigation";
-import { Gamepad2, Users, Trophy, ArrowRight } from "lucide-react";
+import { Gamepad2, Users, Trophy, ArrowRight, Flame, Zap, Clock } from "lucide-react";
 import { TOPIC_ICONS, TOPIC_LABELS } from "@/lib/topics";
 import { useEffect } from "react";
 import { useTriviaCategories } from "@/stores/useTriviaCategories";
@@ -154,62 +152,92 @@ export const Body = (props: BodyPropsType) => {
             )}
 
             <motion.div
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
                 className="w-full max-w-4xl"
             >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {features.map((feature, i) => (
-                        <motion.div
+                        <div
                             key={feature.title}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
-                            whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
-                            className="relative flex flex-col items-center text-center gap-2 rounded-xl border-2 border-primary/20 bg-card pt-14 pb-6 px-6 hover:border-primary/40 hover:shadow-md hover:ring-1 hover:ring-primary/30 transition-all duration-200"
+                            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 hover:border-border hover:bg-accent/30 transition-colors duration-200"
                         >
-                            <div className="absolute top-0 left-0 right-0 h-12 bg-primary rounded-t-xl flex items-center justify-center">
-                                <motion.div
-                                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                                    transition={{ duration: 0.4 }}
-                                >
-                                    <feature.icon className="size-6 text-primary-foreground" />
-                                </motion.div>
+                            <div className="size-10 rounded-lg bg-muted flex items-center justify-center">
+                                <feature.icon className="size-5 text-foreground" />
                             </div>
-                            <span className="absolute top-2 right-3 font-mono text-[10px] tracking-widest text-muted-foreground">
-                                {i === 0 ? "1UP" : i === 1 ? "VS" : "HI"}
-                            </span>
-                            <h3 className="font-semibold text-lg">{feature.title}</h3>
-                            <p className="text-sm text-muted-foreground">{feature.desc}</p>
-                        </motion.div>
+                            <h3 className="font-semibold text-base">{feature.title}</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+                        </div>
                     ))}
                 </div>
             </motion.div>
 
-            {!props.logged ? (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.9, duration: 0.5 }}
-                    className="w-full max-w-3xl"
-                >
-                    <Separator className="mb-8" />
-                    <p className="text-center text-muted-foreground text-sm mb-4">
-                        Try a sample question
-                    </p>
-                    <CarouselDemo />
-                </motion.div>
-            ) : (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.9, duration: 0.5 }}
-                    className="w-full"
-                >
-                    <Separator className="mb-4" />
-                </motion.div>
-            )}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="w-full max-w-4xl"
+            >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-lg bg-muted flex items-center justify-center">
+                                <Flame className="size-5 text-foreground" />
+                            </div>
+                            <h3 className="font-semibold">Daily Challenge</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">One question every day. Keep your streak and climb the leaderboard.</p>
+                        <Button variant="outline" size="sm" className="mt-1 w-fit" onClick={() => router.push(props.logged ? "/single-player" : "/auth/sign-in")}>
+                            Play daily
+                        </Button>
+                    </div>
+                    <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-lg bg-muted flex items-center justify-center">
+                                <Zap className="size-5 text-foreground" />
+                            </div>
+                            <h3 className="font-semibold">Speed Run</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">How many can you answer before time runs out? Choose 1, 2 or 4 minutes.</p>
+                        <Button variant="outline" size="sm" className="mt-1 w-fit" onClick={() => router.push(props.logged ? "/single-player?mode=speedrun" : "/auth/sign-in")}>
+                            Try Speed Run
+                        </Button>
+                    </div>
+                </div>
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="w-full max-w-4xl rounded-xl border border-border bg-card p-6 md:p-8"
+            >
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="size-8 rounded-lg bg-muted flex items-center justify-center">
+                        <Clock className="size-4 text-foreground" />
+                    </div>
+                    <h3 className="font-semibold">How it works</h3>
+                </div>
+                <ol className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <li className="flex gap-3">
+                        <span className="size-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">1</span>
+                        <span className="text-muted-foreground">Pick a topic or create a room and invite friends.</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="size-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">2</span>
+                        <span className="text-muted-foreground">Answer quickly. Speed and accuracy build your score.</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="size-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">3</span>
+                        <span className="text-muted-foreground">Check your history and ranking on your profile and leaderboard.</span>
+                    </li>
+                </ol>
+            </motion.div>
+
+            <div className="w-full max-w-4xl">
+                <Separator />
+            </div>
         </div>
     );
 };
