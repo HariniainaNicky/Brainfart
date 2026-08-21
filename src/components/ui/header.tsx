@@ -12,12 +12,20 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/shadcn-component/sheet";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, User, Settings, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./shadcn-component/spinner";
 import { Badge } from "@/components/ui/shadcn-component/badge";
 import { Session } from "@/types/better-auth";
 import { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./shadcn-component/dropdown-menu";
 
 type HeaderPropsType = {
     logged: boolean | undefined;
@@ -79,23 +87,9 @@ export const Header = (props: HeaderPropsType) => {
                 <Button variant="ghost" onClick={handleGoToLeaderboard}>
                     Leaderboard
                 </Button>
-                <Button
-                    variant="ghost"
-                    onClick={() => router.push("/questions")}
-                >
-                    Questions
-                </Button>
-                <Button variant="ghost" onClick={() => router.push("/setting")}>
-                    Settings
-                </Button>
                 <Button variant="ghost" onClick={() => router.push("/contact")}>
                     Contact
                 </Button>
-                {props.logged ? (
-                    <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)}>
-                        Profile
-                    </Button>
-                ) : null}
             </ul>
 
             <div className="sm:hidden flex flex-row items-center m-3">
@@ -125,39 +119,10 @@ export const Header = (props: HeaderPropsType) => {
                             </Button>
                             <Button
                                 variant="ghost"
-                                onClick={() => router.push("/questions")}
-                            >
-                                Questions
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                onClick={() => router.push("/setting")}
-                            >
-                                Settings
-                            </Button>
-                            <Button
-                                variant="ghost"
                                 onClick={() => router.push("/contact")}
                             >
                                 Contact
                             </Button>
-                            {props.logged ? (
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => router.push(`/user/${props.session?.user?.id}`)}
-                                >
-                                    Profile
-                                </Button>
-                            ) : null}
-                            {props.logged ? (
-                                <Button
-                                    variant="ghost"
-                                    type="button"
-                                    onClick={handleLogOut}
-                                >
-                                    {loading ? <Spinner /> : "Log out"}
-                                </Button>
-                            ) : null}
                         </ul>
                         <SheetFooter className="flex flex-row justify-end">
                             <div className="m-5 ">
@@ -169,34 +134,45 @@ export const Header = (props: HeaderPropsType) => {
             </div>
 
             {props.logged ? (
-                <div className="flex flex-row items-center p-2 gap-3">
-                    <Button variant="ghost" onClick={handleGoTonotification}>
-                        <Bell />
-                        {
-                            containsNotificationUnseen ? (
-                                <Badge
-                                    variant="destructive"
-                                    className=""
-                                >
-                                    {unseenNotificationsNumber > 99 ? "99+" : unseenNotificationsNumber}
-                                </Badge>
-                            ) : null
-                        }
+                <div className="flex flex-row items-center p-2 gap-2 sm:gap-3">
+                    <Button variant="ghost" size="icon" className="relative" onClick={handleGoTonotification}>
+                        <Bell className="size-5" />
+                        {containsNotificationUnseen ? (
+                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center">
+                                {unseenNotificationsNumber > 99 ? "99+" : unseenNotificationsNumber}
+                            </Badge>
+                        ) : null}
                     </Button>
-                    <Avatar
-                        src={props.session?.user?.image || ""}
-                        alt={props.session?.user?.username || ""}
-                        size={40}
-                        onClick={() => router.push("/setting")}
-                    />
-                    <Button
-                        variant="default"
-                        type="button"
-                        className="hidden md:block"
-                        onClick={handleLogOut}
-                    >
-                        Log out
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer">
+                                <Avatar
+                                    src={props.session?.user?.image || ""}
+                                    alt={props.session?.user?.username || ""}
+                                    size={36}
+                                />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-sm font-medium truncate">{props.session?.user?.username || props.session?.user?.name || "User"}</span>
+                                    <span className="text-xs text-muted-foreground truncate font-normal">{props.session?.user?.email}</span>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => router.push(`/user/${props.session?.user?.id}`)} className="cursor-pointer">
+                                <User className="size-4" /> Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push("/setting")} className="cursor-pointer">
+                                <Settings className="size-4" /> Settings
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive" onClick={handleLogOut} className="cursor-pointer">
+                                {loading ? <Spinner className="size-4" /> : <LogOut className="size-4" />} Log out
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             ) : (
                 <div className="flex flex-row items-center gap-2 p-4">

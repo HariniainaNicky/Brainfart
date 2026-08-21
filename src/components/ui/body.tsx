@@ -7,6 +7,8 @@ import { UserHistory } from "./user-history";
 import { useRouter } from "next/navigation";
 import { Gamepad2, Users, Trophy, Sparkles } from "lucide-react";
 import { TOPIC_ICONS, TOPIC_LABELS } from "@/lib/topics";
+import { useEffect } from "react";
+import { useTriviaCategories } from "@/stores/useTriviaCategories";
 
 type BodyPropsType = {
     logged: boolean;
@@ -32,6 +34,16 @@ const features = [
 
 export const Body = (props: BodyPropsType) => {
     const router = useRouter();
+    const setCategories = useTriviaCategories((s) => s.setCategories);
+
+    useEffect(() => {
+        fetch("/api/trivia/categories")
+            .then((res) => res.json())
+            .then((data) => {
+                if (Array.isArray(data.data)) setCategories(data.data);
+            })
+            .catch(() => {});
+    }, [setCategories]);
 
     const handleStart = () => {
         if (props.logged) {

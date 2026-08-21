@@ -2,6 +2,7 @@
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions, updateUserScore } from "@/utils/func";
 import { topicIcon, topicLabel } from "@/lib/topics";
 import { createElement, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
 import { Resume } from "./resume";
@@ -31,6 +32,7 @@ export const SinglePlayerMode = () => {
   const { data: session } = authClient.useSession();
   const [startGame, setStartGame] = useState(false);
   const [typeId, setTypeId] = useState<string>("null");
+  const [source, setSource] = useState<"brainfart" | "trivia">("trivia");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [numberOfQuestion, setNumberOfQuestion] = useState(10);
@@ -120,11 +122,46 @@ export const SinglePlayerMode = () => {
       {!startGame && !questionsLoading && (
         <div className="w-full rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col items-center gap-4">
-            <FilterSelector setTypeId={setTypeId} typeId={typeId} />
-            <TriviaCategorySection
-              selectedTypeId={typeId === "null" ? null : typeId}
-              onSelect={setTypeId}
-            />
+            <div className="flex w-full rounded-lg border bg-muted p-1 gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setSource("brainfart");
+                  setTypeId("null");
+                }}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+                  source === "brainfart"
+                    ? "bg-card shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Brainfart
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSource("trivia");
+                  setTypeId("null");
+                }}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+                  source === "trivia"
+                    ? "bg-card shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Trivia
+              </button>
+            </div>
+            {source === "brainfart" ? (
+              <FilterSelector setTypeId={setTypeId} typeId={typeId} />
+            ) : (
+              <TriviaCategorySection
+                selectedTypeId={typeId === "null" ? null : typeId}
+                onSelect={setTypeId}
+              />
+            )}
             <p className="text-sm text-muted-foreground">Number of questions</p>
             <div className="flex flex-row items-center gap-4">
               <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>

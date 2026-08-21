@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { topicIcon } from "@/lib/topics";
 import { cn } from "@/lib/utils";
+import { useTriviaCategories } from "@/stores/useTriviaCategories";
 
 type TriviaCategory = {
   id: string;
@@ -15,15 +16,20 @@ type TriviaCategorySectionProps = {
 };
 
 export const TriviaCategorySection = ({ selectedTypeId, onSelect }: TriviaCategorySectionProps) => {
-  const [categories, setCategories] = useState<TriviaCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedCategories = useTriviaCategories((s) => s.categories);
+  const setCachedCategories = useTriviaCategories((s) => s.setCategories);
+  const [categories, setCategories] = useState<TriviaCategory[]>(() => cachedCategories ?? []);
+  const [loading, setLoading] = useState(() => cachedCategories == null);
 
   useEffect(() => {
+    if (cachedCategories) return;
     const fetchCategories = async () => {
       try {
         const res = await fetch("/api/trivia/categories");
         const data = await res.json();
-        setCategories(Array.isArray(data.data) ? data.data : []);
+        const list = Array.isArray(data.data) ? data.data : [];
+        setCategories(list);
+        if (list.length) setCachedCategories(list);
       } catch {
         // silently fail
       } finally {
@@ -31,7 +37,7 @@ export const TriviaCategorySection = ({ selectedTypeId, onSelect }: TriviaCatego
       }
     };
     fetchCategories();
-  }, []);
+  }, [cachedCategories, setCachedCategories]);
 
   if (loading) {
     return (
@@ -46,9 +52,29 @@ export const TriviaCategorySection = ({ selectedTypeId, onSelect }: TriviaCatego
   if (categories.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       <span className="text-sm text-muted-foreground">Trivia categories</span>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <button
+          type="button"
+          onClick={() => onSelect("null")}
+          className={cn(
+            "flex items-center gap-2 rounded-lg border bg-card px-3 py-2.5 text-left cursor-pointer transition-colors duration-200",
+            selectedTypeId == null
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border hover:border-primary/40 hover:bg-accent",
+          )}
+        >
+          <span
+            className={cn(
+              "flex size-7 shrink-0 items-center justify-center rounded-md",
+              selectedTypeId == null ? "bg-primary-foreground/15" : "bg-muted",
+            )}
+          >
+            <span className={cn("text-xs font-bold", selectedTypeId == null ? "text-primary-foreground" : "text-muted-foreground")}>All</span>
+          </span>
+          <span className="text-xs font-medium leading-tight">All</span>
+        </button>
         {categories.map((category) => {
           const Icon = topicIcon(category.id);
           const selected = selectedTypeId === category.id;

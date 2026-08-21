@@ -42,66 +42,64 @@ export const SettingBodyContent = ({
     setAdminDashboardShowed(section === "Admin setting");
   };
 
+  const isAdmin = session.user.role === "admin";
+
   return (
-    <div className="flex flex-col md:flex-row gap-4 p-4 h-screen">
-      {/* Sidebar */}
-      <aside className="flex-none md:w-48 flex flex-col gap-3">
-        <Button
-          variant={profilShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("profil")}
-          className="justify-start"
-        >
-          Profil
-        </Button>
-        <Button
-          variant={accountShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("account")}
-          className="justify-start"
-        >
-          Account
-        </Button>
-        <Button
-          variant={sessionShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("session")}
-          className="justify-start"
-        >
-          Session
-        </Button>
-        <Button
-          variant={adminDashboardShowed ? "outline" : "ghost"}
-          onClick={() => handleShow("Admin setting")}
-          className="justify-start"
-        >
-          Admin Dashboard
-        </Button>
+    <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 p-4">
+      <aside className="md:w-56 shrink-0">
+        <div className="rounded-xl border border-border bg-card p-2 flex flex-col gap-1 md:sticky md:top-4">
+          <Button
+            variant={profilShowed ? "secondary" : "ghost"}
+            onClick={() => handleShow("profil")}
+            className="justify-start cursor-pointer"
+          >
+            Profil
+          </Button>
+          <Button
+            variant={accountShowed ? "secondary" : "ghost"}
+            onClick={() => handleShow("account")}
+            className="justify-start cursor-pointer"
+          >
+            Account
+          </Button>
+          <Button
+            variant={sessionShowed ? "secondary" : "ghost"}
+            onClick={() => handleShow("session")}
+            className="justify-start cursor-pointer"
+          >
+            Sessions
+          </Button>
+          {isAdmin && (
+            <Button
+              variant={adminDashboardShowed ? "secondary" : "ghost"}
+              onClick={() => handleShow("Admin setting")}
+              className="justify-start cursor-pointer"
+            >
+              Admin
+            </Button>
+          )}
+        </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-h-0">
-        {profilShowed && (
-          <div className="flex flex-col h-[75%]">
-            <ProfilBody session={session} />
-            <Separator className="my-4" />
-            <ProfilSettings />
-          </div>
-        )}
+      <div className="flex-1 min-w-0">
+        <div className="rounded-xl border border-border bg-card p-6">
+          {profilShowed && (
+            <div className="flex flex-col gap-6">
+              <ProfilBody session={session} />
+              <Separator />
+              <ProfilSettings />
+            </div>
+          )}
 
-        {accountShowed && (
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
-            <AccountSetting />
-          </div>
-        )}
+          {accountShowed && <AccountSetting />}
 
-        {sessionShowed && (
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
-            <SessionSetting />
-          </div>
-        )}
+          {sessionShowed && <SessionSetting />}
 
-        {session.user.role === "admin" && adminDashboardShowed && (
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
-            <AdminDashBoard />
-          </div>
-        )}
+          {isAdmin && adminDashboardShowed && <AdminDashBoard />}
+          {isAdmin && adminDashboardShowed === false && !profilShowed && !accountShowed && !sessionShowed && (
+            <p className="text-sm text-muted-foreground text-center py-8">Select a section from the sidebar.</p>
+          )}
+        </div>
       </div>
     </div>
   );

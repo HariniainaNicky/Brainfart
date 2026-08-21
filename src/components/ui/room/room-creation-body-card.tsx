@@ -1,6 +1,7 @@
 "use client";
 import { FilterSelector } from "./filter-selector";
 import { TriviaCategorySection } from "./trivia-category-section";
+import { cn } from "@/lib/utils";
 import { FieldErrors, useForm } from "react-hook-form";
 import { Input } from "../shadcn-component/input";
 import { AddAndRemoveButton } from "../button/add-and-remove-button";
@@ -20,6 +21,7 @@ export const RoomCreationBodyCard = () => {
   const [numberOfQuestion, setNumberOfQuestion] = useState(10);
   const [chronoTiming, setChronoTiming] = useState(10);
   const [typeId, setTypeId] = useState<string>("null");
+  const [source, setSource] = useState<"brainfart" | "trivia">("trivia");
   const router = useRouter();
 
   const { handleSubmit, register, formState: { errors } } = useForm<FormValues>();
@@ -66,13 +68,49 @@ export const RoomCreationBodyCard = () => {
 
       <div className="flex flex-wrap items-center gap-3">
         <ChronoTimingSelector setChronoTiming={setChronoTiming} chronoTiming={chronoTiming} />
-        <FilterSelector setTypeId={setTypeId} typeId={typeId} />
       </div>
 
-      <TriviaCategorySection
-        selectedTypeId={typeId === "null" ? null : typeId}
-        onSelect={setTypeId}
-      />
+      <div className="flex w-full rounded-lg border bg-muted p-1 gap-1">
+        <button
+          type="button"
+          onClick={() => {
+            setSource("brainfart");
+            setTypeId("null");
+          }}
+          className={cn(
+            "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+            source === "brainfart"
+              ? "bg-card shadow-sm border border-border"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Brainfart
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSource("trivia");
+            setTypeId("null");
+          }}
+          className={cn(
+            "flex-1 rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors duration-200",
+            source === "trivia"
+              ? "bg-card shadow-sm border border-border"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Trivia
+        </button>
+      </div>
+
+      {source === "brainfart" ? (
+        <FilterSelector setTypeId={setTypeId} typeId={typeId} />
+      ) : (
+        <TriviaCategorySection
+          selectedTypeId={typeId === "null" ? null : typeId}
+          onSelect={setTypeId}
+        />
+      )}
 
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">Questions:</span>

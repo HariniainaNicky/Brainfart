@@ -15,6 +15,7 @@ type FilterSelectorProps = {
 
 export const FilterSelector = ({ setTypeId, typeId }: FilterSelectorProps) => {
   const [types, setTypes] = useState<Type[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -28,10 +29,18 @@ export const FilterSelector = ({ setTypeId, typeId }: FilterSelectorProps) => {
         );
       } catch {
         // silently fail
+      } finally {
+        setLoading(false);
       }
     };
     fetchTypes();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="h-9 w-[250px] rounded-md border border-border bg-muted animate-pulse" />
+    );
+  }
 
   return (
     <Select value={typeId} onValueChange={setTypeId}>

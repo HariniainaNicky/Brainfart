@@ -8,6 +8,7 @@ import {
     markNotificationAsRead,
 } from "@/utils/func";
 import { NotificationAction } from "./notification-action";
+import { Bell } from "lucide-react";
 import toast from "react-hot-toast";
 
 type NotificationDisplayerProps = {
@@ -67,6 +68,28 @@ export const NotificationDisplayer = (props: NotificationDisplayerProps) => {
             console.log(error);
         }
     };
+
+    if (!userData) {
+        return (
+            <div className="flex flex-col gap-2 m-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
+                ))}
+            </div>
+        );
+    }
+
+    if (notifications.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 px-4 text-center border border-dashed border-border rounded-xl bg-card m-2">
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center">
+                    <Bell className="size-6 text-muted-foreground" />
+                </div>
+                <p className="font-medium">No notification yet</p>
+                <p className="text-sm text-muted-foreground max-w-sm">You&apos;re all caught up! Notifications about your questions and rooms will appear here.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-2 m-2">
