@@ -131,7 +131,7 @@ export const Header = (props: HeaderPropsType) => {
             <div className="md:hidden flex flex-row items-center m-2">
                 <Sheet>
                     <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-10">
+                        <Button variant="ghost" size="icon" className="size-11">
                             <Menu className="size-5" />
                         </Button>
                     </SheetTrigger>
@@ -163,6 +163,19 @@ export const Header = (props: HeaderPropsType) => {
                                     More next release
                                 </Button>
                             </div>
+                            {props.logged && (
+                                <>
+                                    <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)} className="justify-start gap-2">
+                                        <User className="size-4" /> Profile
+                                    </Button>
+                                    <Button variant="ghost" onClick={() => router.push("/setting")} className="justify-start gap-2">
+                                        <Settings className="size-4" /> Settings
+                                    </Button>
+                                    <Button variant="ghost" onClick={handleLogOut} className="justify-start gap-2 text-destructive">
+                                        <LogOut className="size-4" /> Log out
+                                    </Button>
+                                </>
+                            )}
                             <Button
                                 variant="ghost"
                                 onClick={handleGoToLeaderboard}
@@ -189,7 +202,7 @@ export const Header = (props: HeaderPropsType) => {
             {props.logged ? (
                 <div className="flex flex-row items-center p-2 gap-1 sm:gap-2">
                     <DailyStreak />
-                    <Button variant="ghost" size="icon" className="relative size-10" onClick={handleGoTonotification}>
+                    <Button variant="ghost" size="icon" className="relative size-11" onClick={handleGoTonotification}>
                         <Bell className="size-5" />
                         {containsNotificationUnseen ? (
                             <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center">
@@ -202,7 +215,7 @@ export const Header = (props: HeaderPropsType) => {
                             <Avatar
                                 src={props.session?.user?.image || ""}
                                 alt={props.session?.user?.username || ""}
-                                size={40}
+                                size={44}
                                 className="cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
                             />
                         </DropdownMenuTrigger>

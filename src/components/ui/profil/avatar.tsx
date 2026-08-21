@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Button } from "../shadcn-component/button";
 import { Spinner } from "../shadcn-component/spinner";
 
@@ -14,15 +14,18 @@ type AvatarPropsType = {
   className?: string;
 };
 
-export const Avatar = ({ loading = false, src, alt = "avatar", size = 48, onClick, className }: AvatarPropsType) => {
+export const Avatar = forwardRef<HTMLButtonElement, AvatarPropsType & React.ComponentPropsWithoutRef<"button">>(
+  ({ loading = false, src, alt = "avatar", size = 48, onClick, className, ...props }, ref) => {
   const letter = alt.charAt(0).toUpperCase();
 
   return (
     <Button
+      ref={ref}
       variant="secondary"
-      className={`overflow-hidden rounded-full flex items-center justify-center border font-bold p-0 hover:cursor-pointer ${className ?? ""}`}
+      className={`overflow-hidden rounded-full flex items-center justify-center border font-bold p-0 hover:cursor-pointer shrink-0 ${className ?? ""}`}
       style={{ width: size, height: size }}
       onClick={onClick}
+      {...props}
     >
       {src && !loading ? (
         <img
@@ -37,4 +40,5 @@ export const Avatar = ({ loading = false, src, alt = "avatar", size = 48, onClic
       )}
     </Button>
   );
-};
+});
+Avatar.displayName = "Avatar";
