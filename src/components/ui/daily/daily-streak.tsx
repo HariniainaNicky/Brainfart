@@ -75,11 +75,11 @@ export const DailyStreak = () => {
         return;
       }
       if (json.data.correct) {
-        toast.success(`Correct! Streak: ${json.data.streak} 🔥`);
+        toast.success(`Correct! Streak: ${json.data.streak}`);
         setStreak(json.data.streak);
         setCompletedToday(true);
       } else {
-        toast.error("Wrong answer — try again tomorrow!");
+        toast.error("Wrong answer. Try again tomorrow!");
         setCompletedToday(true);
       }
       setOpen(false);
@@ -102,7 +102,7 @@ export const DailyStreak = () => {
         title={completedToday ? "Daily completed" : "Play daily trivia"}
       >
         <Flame className={`size-4 ${completedToday ? "text-orange-500 fill-orange-500" : "text-muted-foreground"}`} />
-        <span className="text-sm font-semibold tabular-nums">{streak ?? "—"}</span>
+        <span className="text-sm font-semibold tabular-nums">{streak ?? "-"}</span>
         {completedToday && <Check className="size-3 text-green-600" />}
       </Button>
 
@@ -113,7 +113,7 @@ export const DailyStreak = () => {
               <Flame className="size-5 text-orange-500" /> Daily trivia
             </DialogTitle>
             <DialogDescription>
-              {completedToday ? "You’ve completed today’s daily — come back tomorrow!" : "Answer today’s question to keep your streak!"}
+              {completedToday ? "You have completed todays daily. Come back tomorrow!" : "Answer todays question to keep your streak!"}
             </DialogDescription>
           </DialogHeader>
 
@@ -121,7 +121,7 @@ export const DailyStreak = () => {
             <div className="flex flex-col gap-4">
               <p className="font-medium">{dailyData.question.question}</p>
               <div className="flex flex-col gap-2">
-                {(dailyData.question.options?.length ? dailyData.question.options : [dailyData.question.Answer]).map((opt) => (
+                {dailyData.question.options.map((opt) => (
                   <button
                     key={opt}
                     type="button"

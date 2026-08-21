@@ -10,6 +10,15 @@ const hashString = (str: string) => {
   return hash;
 };
 
+const shuffle = <T>(arr: T[]): T[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
 export const getDailyQuestion = async () => {
   const today = getTodayString();
   const count = await prisma.question.count({ where: { isValidated: true } });
@@ -22,7 +31,23 @@ export const getDailyQuestion = async () => {
     take: 1,
     include: { type: true },
   });
-  return question ?? null;
+  if (!question) return null;
+
+  if (!question.options || question.options.length < 2) {
+    const others = await prisma.question.findMany({
+      where: { isValidated: true, id: { not: question.id } },
+      select: { Answer: true },
+      take: 50,
+    });
+    const pool = shuffle(others.map((o) => o.Answer).filter((a) => a !== question.Answer));
+    const picks = pool.slice(0, 3);
+    while (picks.length < 3) picks.push(`Option ${picks.length + 1}`);
+    question.options = shuffle([question.Answer, ...picks]);
+  } else {
+    question.options = shuffle([...question.options]);
+  }
+
+  return question;
 };
 
 export const getUserDailyState = async (userId: string) => {
