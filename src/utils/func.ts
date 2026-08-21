@@ -108,9 +108,9 @@ export const getType = async () => {
         const url = `/api/types`;
         const res = await fetch(url);
         const data = await res.json();
-        return data.data;
+        return Array.isArray(data.data) ? data.data : [];
     } catch {
-        return undefined;
+        return [];
     }
 };
 
@@ -122,9 +122,9 @@ export const getQuestions = async (
         const url = `/api/questions/${type}?numberOfQuestion=${numberOfQuestion}`;
         const res = await fetch(url);
         const data = await res.json();
-        return data.data;
+        return Array.isArray(data.data) ? data.data : [];
     } catch {
-        return undefined;
+        return [];
     }
 };
 
@@ -142,9 +142,9 @@ export const getAllQuestions = async (
         }
         const res = await fetch(url);
         const data = await res.json();
-        return data.data;
+        return Array.isArray(data.data) ? data.data : [];
     } catch {
-        return undefined;
+        return [];
     }
 };
 

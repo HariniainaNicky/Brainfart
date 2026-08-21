@@ -21,7 +21,11 @@ export const FilterSelector = ({ setTypeId, typeId }: FilterSelectorProps) => {
       try {
         const res = await fetch("/api/types");
         const data = await res.json();
-        setTypes(data.data);
+        setTypes(
+          Array.isArray(data.data)
+            ? data.data.filter((type: Type) => type.apiCategoryId == null)
+            : [],
+        );
       } catch {
         // silently fail
       }

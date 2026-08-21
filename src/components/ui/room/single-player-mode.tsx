@@ -6,6 +6,7 @@ import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
 import { Resume } from "./resume";
 import { FilterSelector } from "./filter-selector";
+import { TriviaCategorySection } from "./trivia-category-section";
 import { Checkbox } from "../shadcn-component/checkbox";
 import { Button } from "../shadcn-component/button";
 import { toast } from "react-hot-toast";
@@ -120,6 +121,10 @@ export const SinglePlayerMode = () => {
         <div className="w-full rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col items-center gap-4">
             <FilterSelector setTypeId={setTypeId} typeId={typeId} />
+            <TriviaCategorySection
+              selectedTypeId={typeId === "null" ? null : typeId}
+              onSelect={setTypeId}
+            />
             <p className="text-sm text-muted-foreground">Number of questions</p>
             <div className="flex flex-row items-center gap-4">
               <span className="text-lg font-semibold min-w-[1.5rem] text-center">{numberOfQuestion}</span>

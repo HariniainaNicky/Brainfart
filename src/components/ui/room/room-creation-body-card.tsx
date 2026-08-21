@@ -1,5 +1,6 @@
 "use client";
 import { FilterSelector } from "./filter-selector";
+import { TriviaCategorySection } from "./trivia-category-section";
 import { FieldErrors, useForm } from "react-hook-form";
 import { Input } from "../shadcn-component/input";
 import { AddAndRemoveButton } from "../button/add-and-remove-button";
@@ -67,6 +68,11 @@ export const RoomCreationBodyCard = () => {
         <ChronoTimingSelector setChronoTiming={setChronoTiming} chronoTiming={chronoTiming} />
         <FilterSelector setTypeId={setTypeId} typeId={typeId} />
       </div>
+
+      <TriviaCategorySection
+        selectedTypeId={typeId === "null" ? null : typeId}
+        onSelect={setTypeId}
+      />
 
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">Questions:</span>
