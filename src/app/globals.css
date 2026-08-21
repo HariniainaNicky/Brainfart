@@ -44,7 +44,7 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0rem;
   --card: #FAFBFA;
   --card-foreground: #0A0908;
   --popover: #FAFBFA;
@@ -127,4 +127,8 @@ body {
 
 h1, h2, h3 {
   font-family: "Pixelify Sans", system-ui;
+}
+
+* {
+  border-radius: 0 !important;
 }

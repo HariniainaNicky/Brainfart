@@ -12,7 +12,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/shadcn-component/sheet";
-import { Bell, Menu, User, Settings, LogOut, ChevronDown, Gamepad2, Brain, Zap, Puzzle } from "lucide-react";
+import { Bell, Menu, User, Settings, LogOut, ChevronDown, Gamepad2, Brain, Zap, Puzzle, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./shadcn-component/spinner";
 import { Badge } from "@/components/ui/shadcn-component/badge";
@@ -120,6 +120,9 @@ export const Header = (props: HeaderPropsType) => {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <Button variant="ghost" onClick={() => router.push("/create")} className="gap-1.5">
+                    <Pencil className="size-4" /> Creation Mode
+                </Button>
                 <Button variant="ghost" onClick={handleGoToLeaderboard}>
                     Leaderboard
                 </Button>
@@ -163,6 +166,9 @@ export const Header = (props: HeaderPropsType) => {
                                     More next release
                                 </Button>
                             </div>
+                            <Button variant="ghost" onClick={() => router.push("/create")} className="justify-start gap-2">
+                                <Pencil className="size-4" /> Creation Mode
+                            </Button>
                             {props.logged && (
                                 <>
                                     <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)} className="justify-start gap-2">

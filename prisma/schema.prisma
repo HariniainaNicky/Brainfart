@@ -87,6 +87,8 @@ model Question {
   difficulty String?
   source    String? @default("user")
   isValidated Boolean @default(true)
+  customTopic String?
+  visibility String? @default("private")
 
   rooms    Room[]
 }
