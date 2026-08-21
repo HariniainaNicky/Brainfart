@@ -37,9 +37,11 @@ export const ContactBodyContent = () => {
     <div className="flex flex-col items-center gap-8 p-6 md:p-10 max-w-2xl mx-auto w-full">
       {/* Profile card */}
       <div className="w-full bg-card border border-border rounded-xl p-6 md:p-8 flex flex-col items-center gap-4 text-center hover:border-primary/30 transition-colors duration-200">
-        <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <span className="text-3xl font-bold text-primary">F</span>
-        </div>
+        <img
+          src="/assets/developer-pic.png"
+          alt="Developer profile"
+          className="size-24 rounded-full object-cover border-2 border-border shadow-sm"
+        />
         <div>
           <h1 className="text-2xl font-bold text-foreground">@ferrissushi</h1>
           <p className="text-sm text-muted-foreground mt-1">BrainFart Developer</p>
