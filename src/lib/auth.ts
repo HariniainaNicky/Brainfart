@@ -54,6 +54,17 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 20,
+    sendResetPassword: async ({ user, url }: { user: { email: string; name: string }; url: string }) => {
+      const html = emailLayout(`
+        <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.3px; color: #18181b;">Reset Your Password</h2>
+        <p style="margin: 0 0 16px 0; color: #52525b;">Hi ${user.name || user.email},</p>
+        <p style="margin: 0 0 4px 0; color: #52525b;">We received a request to reset your password. Click below to set a new one.</p>
+        ${emailButton(url, "Reset Password")}
+        <p style="margin: 0; color: #a1a1aa; font-size: 13px;">Or copy this link into your browser:</p>
+        <p style="margin: 4px 0 0 0; font-size: 13px; word-break: break-all; color: #71717a;">${url}</p>
+      `);
+      await sendEmail(user.email, "Reset your password — BrainFart", html);
+    },
   },
   socialProviders: {
     github: {
