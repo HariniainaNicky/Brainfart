@@ -13,11 +13,22 @@ export const Resume = ({ myAnswers, theAnswers, questions, onBack }: ResumeProps
     (answer, i) => answer === theAnswers[i],
   ).length;
 
+  const accuracy = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+
   return (
     <div className="flex flex-col gap-4 w-full">
-      <div className="text-center">
-        <p className="text-lg font-bold">
-          {correctCount}/{questions.length} correct
+      <div className="flex flex-col items-center gap-1 rounded-xl border border-border bg-card p-5 text-center">
+        <p className="text-4xl font-bold tabular-nums tracking-tight">
+          {correctCount}
+          <span className="text-muted-foreground font-normal">/{questions.length}</span>
+        </p>
+        <p className="text-sm text-muted-foreground">{accuracy}% accuracy</p>
+        <p className="text-xs font-medium text-muted-foreground">
+          {correctCount === questions.length
+            ? "Perfect score!"
+            : correctCount === 0
+              ? "Keep practicing!"
+              : `${questions.length - correctCount} to review`}
         </p>
       </div>
 

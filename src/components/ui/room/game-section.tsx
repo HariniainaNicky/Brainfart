@@ -9,9 +9,9 @@ import { Checkbox } from "../shadcn-component/checkbox";
 import { Label } from "../shadcn-component/label";
 import { Separator } from "../shadcn-component/separator";
 import { Button } from "../shadcn-component/button";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray } from "@/utils/func";
-import { topicLabel } from "@/lib/topics";
+import { topicIcon, topicLabel } from "@/lib/topics";
 import { Session } from "@/types/better-auth";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -168,7 +168,8 @@ export const GameSection = ({ room, session, onBack }: GameSectionProps) => {
             className="flex flex-col gap-4 items-center w-full"
           >
             <div className="flex items-center gap-2">
-              <Badge variant="outline">
+              <Badge variant="outline" className="gap-1.5">
+                {createElement(topicIcon(question.typeId), { className: "size-3.5" })}
                 {topicLabel(question.typeId)}
               </Badge>
               <span className="text-xs text-muted-foreground">

@@ -35,3 +35,64 @@ export const topicLabel = (typeId: string | null | undefined) => {
   if (!typeId) return "MISC";
   return TOPIC_LABELS[typeId] ?? typeId;
 };
+
+import type { LucideIcon } from "lucide-react";
+import {
+  Lightbulb,
+  BookOpen,
+  Clapperboard,
+  Music,
+  Drama,
+  Tv,
+  Gamepad2,
+  Dices,
+  Leaf,
+  Cpu,
+  Calculator,
+  Scroll,
+  Trophy,
+  Globe,
+  Landmark,
+  Scale,
+  Palette,
+  Star,
+  PawPrint,
+  Car,
+  BookMarked,
+  Bot,
+  Sparkles,
+  Rabbit,
+  HelpCircle,
+} from "lucide-react";
+
+export const TOPIC_ICONS: Record<string, LucideIcon> = {
+  "general-knowledge": Lightbulb,
+  "entertainment-books": BookOpen,
+  "entertainment-film": Clapperboard,
+  "entertainment-music": Music,
+  "entertainment-musicals-theatres": Drama,
+  "entertainment-television": Tv,
+  "entertainment-video-games": Gamepad2,
+  "entertainment-board-games": Dices,
+  "science-nature": Leaf,
+  "science-computers": Cpu,
+  "science-mathematics": Calculator,
+  mythology: Scroll,
+  sports: Trophy,
+  geography: Globe,
+  history: Landmark,
+  politics: Scale,
+  art: Palette,
+  celebrities: Star,
+  animals: PawPrint,
+  vehicles: Car,
+  "entertainment-comics": BookMarked,
+  "science-gadgets": Bot,
+  "entertainment-japanese-anime-manga": Sparkles,
+  "entertainment-cartoon-animations": Rabbit,
+};
+
+export const topicIcon = (typeId: string | null | undefined): LucideIcon => {
+  if (!typeId) return HelpCircle;
+  return TOPIC_ICONS[typeId] ?? HelpCircle;
+};

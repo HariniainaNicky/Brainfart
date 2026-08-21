@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button } from "../shadcn-component/button";
+import { topicIcon } from "@/lib/topics";
 import { cn } from "@/lib/utils";
 
 type TriviaCategory = {
@@ -37,7 +37,7 @@ export const TriviaCategorySection = ({ selectedTypeId, onSelect }: TriviaCatego
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-9 rounded-md bg-muted animate-pulse" />
+          <div key={i} className="h-14 rounded-lg bg-muted animate-pulse" />
         ))}
       </div>
     );
@@ -47,23 +47,35 @@ export const TriviaCategorySection = ({ selectedTypeId, onSelect }: TriviaCatego
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm text-muted-foreground">Trivia categories:</span>
+      <span className="text-sm text-muted-foreground">Trivia categories</span>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {categories.map((category) => (
-          <Button
-            key={category.id}
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onSelect(category.id)}
-            className={cn(
-              "justify-start truncate text-xs font-normal",
-              selectedTypeId === category.id && "border-primary bg-primary/10 text-primary",
-            )}
-          >
-            {category.name}
-          </Button>
-        ))}
+        {categories.map((category) => {
+          const Icon = topicIcon(category.id);
+          const selected = selectedTypeId === category.id;
+          return (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => onSelect(category.id)}
+              className={cn(
+                "flex items-center gap-2 rounded-lg border bg-card px-3 py-2.5 text-left cursor-pointer transition-colors duration-200",
+                selected
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border hover:border-primary/40 hover:bg-accent",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-md",
+                  selected ? "bg-primary-foreground/15" : "bg-muted",
+                )}
+              >
+                <Icon className={cn("size-3.5", selected ? "text-primary-foreground" : "text-muted-foreground")} />
+              </span>
+              <span className="text-xs font-medium leading-tight line-clamp-2">{category.name}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

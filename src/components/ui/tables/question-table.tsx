@@ -36,7 +36,7 @@ export const QuestionsTable = (props: QuestionsTableProps) => {
   };
 
   return (
-    <div className="shadow-2xl dark:shadow-primary/20 max-w-full overflow-x-hidden border rounded-lg">
+    <div className="max-w-full overflow-x-hidden border rounded-lg bg-card">
       <div className="flex flex-row gap-2 p-3">
         <Button
           onClick={() => router.push("/")}

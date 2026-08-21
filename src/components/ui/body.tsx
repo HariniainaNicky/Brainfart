@@ -6,6 +6,7 @@ import { Separator } from "./shadcn-component/separator";
 import { UserHistory } from "./user-history";
 import { useRouter } from "next/navigation";
 import { Gamepad2, Users, Trophy, Sparkles } from "lucide-react";
+import { TOPIC_ICONS, TOPIC_LABELS } from "@/lib/topics";
 
 type BodyPropsType = {
     logged: boolean;
@@ -45,10 +46,7 @@ export const Body = (props: BodyPropsType) => {
     };
 
     return (
-        <div className="w-full flex flex-col gap-12 justify-center items-center px-4 relative overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none" aria-hidden>
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl" />
-            </div>
+        <div className="w-full flex flex-col gap-12 justify-center items-center px-4">
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -99,6 +97,40 @@ export const Body = (props: BodyPropsType) => {
                         {props.logged ? "Create room" : "Get started"}
                     </Button>
                 </motion.div>
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+                className="flex flex-wrap justify-center gap-2 max-w-3xl"
+            >
+                <p className="w-full text-center text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                    20+ topics
+                </p>
+                {Object.entries(TOPIC_LABELS)
+                    .slice(0, 12)
+                    .map(([slug, label]) => {
+                        const Icon = TOPIC_ICONS[slug];
+                        return (
+                            <button
+                                key={slug}
+                                type="button"
+                                onClick={() => router.push("/single-player")}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium cursor-pointer hover:border-primary/40 hover:bg-accent transition-colors duration-200"
+                            >
+                                {Icon ? <Icon className="size-3.5 text-muted-foreground" /> : null}
+                                {label}
+                            </button>
+                        );
+                    })}
+                <button
+                    type="button"
+                    onClick={() => router.push("/single-player")}
+                    className="inline-flex items-center rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground cursor-pointer hover:border-primary/40 hover:text-foreground transition-colors duration-200"
+                >
+                    + more
+                </button>
             </motion.div>
 
             <motion.div

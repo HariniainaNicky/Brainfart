@@ -1,7 +1,7 @@
 "use client"
 import { getRandomAnswer as getRandomAnswerApi, shuffleArray, getQuestions, updateUserScore } from "@/utils/func";
-import { topicLabel } from "@/lib/topics";
-import { useEffect } from "react";
+import { topicIcon, topicLabel } from "@/lib/topics";
+import { createElement, useEffect } from "react";
 import { Badge } from "../shadcn-component/badge";
 import { Label } from "../shadcn-component/label";
 import { Resume } from "./resume";
@@ -179,7 +179,8 @@ export const SinglePlayerMode = () => {
                 className="flex flex-col gap-4 items-center w-full"
               >
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="gap-1.5">
+                    {createElement(topicIcon(question.typeId), { className: "size-3.5" })}
                     {topicLabel(question.typeId)}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
