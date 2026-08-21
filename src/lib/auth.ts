@@ -50,6 +50,11 @@ const emailButton = (url: string, label: string) => `
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  rateLimit: {
+    window: 60,
+    max: 10,
+    storage: "memory",
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
