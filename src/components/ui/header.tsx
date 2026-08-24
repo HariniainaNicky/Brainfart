@@ -120,9 +120,6 @@ export const Header = (props: HeaderPropsType) => {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Button variant="ghost" onClick={() => router.push("/create")}>
-                    Creation Mode
-                </Button>
                 <Button variant="ghost" onClick={handleGoToLeaderboard}>
                     Leaderboard
                 </Button>
@@ -166,9 +163,6 @@ export const Header = (props: HeaderPropsType) => {
                                     More next release
                                 </Button>
                             </div>
-                            <Button variant="ghost" onClick={() => router.push("/create")} className="justify-start">
-                                Creation Mode
-                            </Button>
                             {props.logged && (
                                 <>
                                     <Button variant="ghost" onClick={() => router.push(`/user/${props.session?.user?.id}`)} className="justify-start gap-2">
