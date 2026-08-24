@@ -39,6 +39,11 @@ export const DailyStreak = () => {
         setDailyData(json.data);
         setStreak(json.data.streak);
         setCompletedToday(json.data.completedToday);
+        if (!json.data.completedToday && !localStorage.getItem(`daily-autoshown-${today}`)) {
+          localStorage.setItem(`daily-autoshown-${today}`, "1");
+          setSelected(null);
+          setOpen(true);
+        }
       }
     } catch {}
   };

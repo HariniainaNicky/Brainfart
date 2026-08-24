@@ -73,7 +73,12 @@ export const getUserDailyState = async (userId: string, todayParam?: string | nu
   });
   if (!user) return null;
   const today = getTodayForRequest(todayParam);
-  const lastDate = user.lastDailyAt ? new Date(user.lastDailyAt).toISOString().slice(0, 10) : null;
+  const last = await prisma.dailyCompletion.findFirst({
+    where: { userId },
+    orderBy: { date: "desc" },
+    select: { date: true },
+  });
+  const lastDate = last?.date ?? null;
   const completedToday = lastDate === today;
   const yesterday = getYesterdayString(today);
   const streakValid = lastDate === today || lastDate === yesterday;
@@ -111,13 +116,17 @@ export const completeDaily = async (userId: string, correct: boolean, questionId
   });
   if (!user) throw new Error("User not found");
 
-  const lastDate = user.lastDailyAt ? new Date(user.lastDailyAt).toISOString().slice(0, 10) : null;
+  const prev = await prisma.dailyCompletion.findFirst({
+    where: { userId, date: { not: today } },
+    orderBy: { date: "desc" },
+    select: { date: true },
+  });
+  const lastDate = prev?.date ?? null;
   const yesterday = getYesterdayString(today);
 
   let newStreak = 1;
   if (lastDate === yesterday) newStreak = user.streak + 1;
-  else if (lastDate === today) newStreak = user.streak;
-  // else lastDate is older or null => 1
+  // else lastDate is older, null, or today => 1
 
   const newLongest = Math.max(user.longestStreak, newStreak);
 
